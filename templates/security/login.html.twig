@@ -1,0 +1,60 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - HSP Chat{% endblock %}
+
+{% block body %}
+<div class="login-container">
+    <form method="post" class="login-form">
+        <div class="login-header">
+            <h1>🏥 HSP Chat</h1>
+            <p>Plateforme de communication hospitalière</p>
+        </div>
+
+        {% if error %}
+            <div class="error-message">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="inputEmail">Adresse email</label>
+            <input 
+                type="email" 
+                value="{{ last_username }}" 
+                name="email" 
+                id="inputEmail" 
+                required 
+                autofocus
+                placeholder="votre.email@hsp.fr"
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="inputPassword">Mot de passe</label>
+            <input 
+                type="password" 
+                name="password" 
+                id="inputPassword" 
+                required
+                placeholder="Entrez votre mot de passe"
+            >
+        </div>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <button class="login-button" type="submit">
+            🔐 Se connecter
+        </button>
+
+        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e8f0; text-align: center; font-size: 14px; color: #64748b;">
+            <p><strong>Types d'utilisateurs :</strong></p>
+            <div style="display: flex; justify-content: space-around; margin-top: 12px; flex-wrap: wrap; gap: 8px;">
+                <span class="user-type-badge medecin">Médecin</span>
+                <span class="user-type-badge professeur">Professeur</span>
+                <span class="user-type-badge entreprise">Entreprise</span>
+                <span class="user-type-badge etudiant">Étudiant</span>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
