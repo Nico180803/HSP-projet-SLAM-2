@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\EvenementsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -40,6 +42,28 @@ class Evenements
 
     #[ORM\Column]
     private ?bool $est_valide = null;
+
+    #[ORM\ManyToOne(inversedBy: 'evenements')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TypesEvenements $refTypesEvenement = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evenementsInscrits')]
+    private Collection $inscrits;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evenementsResponsable')]
+    private Collection $responsables;
+
+    public function __construct()
+    {
+        $this->inscrits = new ArrayCollection();
+        $this->responsables = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -150,6 +174,66 @@ class Evenements
     public function setEstValide(bool $est_valide): static
     {
         $this->est_valide = $est_valide;
+
+        return $this;
+    }
+
+    public function getRefTypesEvenement(): ?TypesEvenements
+    {
+        return $this->refTypesEvenement;
+    }
+
+    public function setRefTypesEvenement(?TypesEvenements $refTypesEvenement): static
+    {
+        $this->refTypesEvenement = $refTypesEvenement;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getinscrits(): Collection
+    {
+        return $this->inscrits;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->inscrits->contains($user)) {
+            $this->inscrits->add($user);
+        }
+
+        return $this;
+    }
+
+    public function removeUser(User $user): static
+    {
+        $this->inscrits->removeElement($user);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getResponsables(): Collection
+    {
+        return $this->responsables;
+    }
+
+    public function addResponsable(User $responsable): static
+    {
+        if (!$this->responsables->contains($responsable)) {
+            $this->responsables->add($responsable);
+        }
+
+        return $this;
+    }
+
+    public function removeResponsable(User $responsable): static
+    {
+        $this->responsables->removeElement($responsable);
 
         return $this;
     }

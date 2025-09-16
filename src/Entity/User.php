@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -69,6 +71,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $nb_rueEntreprise = null;
+
+    /**
+     * @var Collection<int, Evenements>
+     */
+    #[ORM\ManyToMany(targetEntity: Evenements::class, mappedBy: 'inscrits')]
+    private Collection $evenementsInscrits;
+
+    /**
+     * @var Collection<int, Evenements>
+     */
+    #[ORM\ManyToMany(targetEntity: Evenements::class, mappedBy: 'responsables')]
+    private Collection $evenementsResponsable;
+
+    public function __construct()
+    {
+        $this->evenementsInscrits = new ArrayCollection();
+        $this->evenementsResponsable = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -295,6 +315,60 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNbRueEntreprise(?string $nb_rueEntreprise): static
     {
         $this->nb_rueEntreprise = $nb_rueEntreprise;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evenements>
+     */
+    public function getEvenementsInscrits(): Collection
+    {
+        return $this->evenementsInscrits;
+    }
+
+    public function addEvenement(Evenements $evenement): static
+    {
+        if (!$this->evenementsInscrits->contains($evenement)) {
+            $this->evenementsInscrits->add($evenement);
+            $evenement->addUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvenement(Evenements $evenement): static
+    {
+        if ($this->evenementsInscrits->removeElement($evenement)) {
+            $evenement->removeUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evenements>
+     */
+    public function getEvenementsResponsable(): Collection
+    {
+        return $this->evenementsResponsable;
+    }
+
+    public function addEvenementsResponsable(Evenements $evenementsResponsable): static
+    {
+        if (!$this->evenementsResponsable->contains($evenementsResponsable)) {
+            $this->evenementsResponsable->add($evenementsResponsable);
+            $evenementsResponsable->addResponsable($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvenementsResponsable(Evenements $evenementsResponsable): static
+    {
+        if ($this->evenementsResponsable->removeElement($evenementsResponsable)) {
+            $evenementsResponsable->removeResponsable($this);
+        }
 
         return $this;
     }
