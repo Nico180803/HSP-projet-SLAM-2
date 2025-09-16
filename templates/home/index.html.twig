@@ -78,10 +78,10 @@
 
         <div class="message-input-container">
             <form class="message-input-form" id="message-form">
-                <input 
-                    type="text" 
-                    class="message-input" 
-                    id="message-input" 
+                <input
+                    type="text"
+                    class="message-input"
+                    id="message-input"
                     placeholder="Tapez votre message ici... (utilisez 'URGENT' pour les messages prioritaires)"
                     disabled
                 >
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const now = new Date();
         const diffTime = Math.abs(now - date);
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
+
         if (diffDays === 1) {
             return 'Aujourd\'hui ' + date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
         } else if (diffDays === 2) {
@@ -131,9 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function createMessageElement(message) {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message' + (message.type === 'urgent' ? ' urgent' : '');
-        
+
         const senderBadge = message.sender.userType ? `<span class="user-type-badge ${message.sender.userType.toLowerCase()}">${message.sender.userType}</span>` : '';
-        
+
         messageDiv.innerHTML = `
             <div class="message-header">
                 <span class="sender-name">${message.sender.fullName}</span>
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
             <div class="message-content">${message.content}</div>
         `;
-        
+
         return messageDiv;
     }
 
@@ -152,16 +152,16 @@ document.addEventListener('DOMContentLoaded', function() {
         item.addEventListener('click', function() {
             const channelId = this.dataset.channelId;
             const channelName = this.dataset.channelName;
-            
+
             // Mise à jour de l'interface
             channelItems.forEach(ch => ch.classList.remove('active'));
             this.classList.add('active');
-            
+
             // Mise à jour du header
             const icon = this.querySelector('.channel-icon').textContent;
             channelIcon.textContent = icon;
             currentChannelName.innerHTML = `<span id="channel-icon">${icon}</span> ${channelName}`;
-            
+
             // Chargement des messages du canal
             loadChannel(channelId);
         });
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadChannel(channelId) {
         currentChannelId = channelId;
         messagesContainer.innerHTML = '<div class="loading">Chargement des messages...</div>';
-        
+
         fetch(`/channel/${channelId}`)
             .then(response => response.json())
             .then(data => {
@@ -179,29 +179,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     messagesContainer.innerHTML = `<div class="error-message">${data.error}</div>`;
                     return;
                 }
-                
+
                 // Mise à jour de la description
                 currentChannelDescription.textContent = data.channel.description || 'Canal de communication';
-                
+
                 // Affichage des messages
                 messagesContainer.innerHTML = '';
                 data.messages.forEach(message => {
                     messagesContainer.appendChild(createMessageElement(message));
                 });
-                
+
                 // Scroll vers le bas
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
-                
+
                 // Activation de l'input
                 messageInput.disabled = false;
                 sendButton.disabled = false;
                 messageInput.placeholder = `Message #${data.channel.name}`;
-                
+
                 // Mise à jour du timestamp
                 if (data.messages.length > 0) {
                     lastMessageTimestamp = Math.floor(new Date(data.messages[data.messages.length - 1].createdAt).getTime() / 1000);
                 }
-                
+
                 // Démarrer le polling
                 startPolling();
             })
@@ -214,13 +214,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Envoi de message
     messageForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
+
         const content = messageInput.value.trim();
         if (!content || !currentChannelId) return;
-        
+
         sendButton.disabled = true;
         sendButton.textContent = 'Envoi...';
-        
+
         fetch(`/channel/${currentChannelId}/message`, {
             method: 'POST',
             headers: {
@@ -234,14 +234,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert(data.error);
                 return;
             }
-            
+
             // Ajouter le message à la liste
             messagesContainer.appendChild(createMessageElement(data));
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            
+
             // Vider l'input
             messageInput.value = '';
-            
+
             // Mettre à jour le timestamp
             lastMessageTimestamp = Math.floor(new Date(data.createdAt).getTime() / 1000);
         })
@@ -260,10 +260,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (pollInterval) {
             clearInterval(pollInterval);
         }
-        
+
         pollInterval = setInterval(() => {
             if (!currentChannelId || lastMessageTimestamp === 0) return;
-            
+
             fetch(`/channel/${currentChannelId}/messages/since/${lastMessageTimestamp}`)
                 .then(response => response.json())
                 .then(data => {
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 const onlineUsersContainer = document.getElementById('online-users');
                 onlineUsersContainer.innerHTML = '';
-                
+
                 data.users.forEach(user => {
                     const userDiv = document.createElement('div');
                     userDiv.className = 'user-item';
