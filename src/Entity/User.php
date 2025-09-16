@@ -62,10 +62,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $formation = null;
 
     #[ORM\Column(nullable: true)]
-    private ?bool $EstProfesseur = null;
-
-    #[ORM\Column(nullable: true)]
     private ?bool $EstValide = null;
+
+    #[ORM\Column]
+    private ?\DateTime $date_creation = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $nb_rueEntreprise = null;
 
     public function getId(): ?int
     {
@@ -260,18 +263,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function isEstProfesseur(): ?bool
-    {
-        return $this->EstProfesseur;
-    }
-
-    public function setEstProfesseur(?bool $EstProfesseur): static
-    {
-        $this->EstProfesseur = $EstProfesseur;
-
-        return $this;
-    }
-
     public function isEstValide(): ?bool
     {
         return $this->EstValide;
@@ -280,6 +271,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEstValide(?bool $EstValide): static
     {
         $this->EstValide = $EstValide;
+
+        return $this;
+    }
+
+    public function getDateCreation(): ?\DateTime
+    {
+        return $this->date_creation;
+    }
+
+    public function setDateCreation(\DateTime $date_creation): static
+    {
+        $this->date_creation = $date_creation;
+
+        return $this;
+    }
+
+    public function getNbRueEntreprise(): ?string
+    {
+        return $this->nb_rueEntreprise;
+    }
+
+    public function setNbRueEntreprise(?string $nb_rueEntreprise): static
+    {
+        $this->nb_rueEntreprise = $nb_rueEntreprise;
 
         return $this;
     }
