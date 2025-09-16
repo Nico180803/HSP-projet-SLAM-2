@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OffresRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -31,6 +33,32 @@ class Offres
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $pj = null;
+
+    /**
+     * @var Collection<int, ContactsEntreprise>
+     */
+    #[ORM\ManyToMany(targetEntity: ContactsEntreprise::class, mappedBy: 'refOffre')]
+    private Collection $contactsEntreprises;
+
+    #[ORM\ManyToOne(inversedBy: 'offres')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TypesOffres $refTypesOffre = null;
+
+    #[ORM\ManyToOne(inversedBy: 'offres')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $refCreateur = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'candidatures')]
+    private Collection $refUser;
+
+    public function __construct()
+    {
+        $this->contactsEntreprises = new ArrayCollection();
+        $this->refUser = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -105,6 +133,81 @@ class Offres
     public function setPj(?string $pj): static
     {
         $this->pj = $pj;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ContactsEntreprise>
+     */
+    public function getContactsEntreprises(): Collection
+    {
+        return $this->contactsEntreprises;
+    }
+
+    public function addContactsEntreprise(ContactsEntreprise $contactsEntreprise): static
+    {
+        if (!$this->contactsEntreprises->contains($contactsEntreprise)) {
+            $this->contactsEntreprises->add($contactsEntreprise);
+            $contactsEntreprise->addRefOffre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContactsEntreprise(ContactsEntreprise $contactsEntreprise): static
+    {
+        if ($this->contactsEntreprises->removeElement($contactsEntreprise)) {
+            $contactsEntreprise->removeRefOffre($this);
+        }
+
+        return $this;
+    }
+
+    public function getRefTypesOffre(): ?TypesOffres
+    {
+        return $this->refTypesOffre;
+    }
+
+    public function setRefTypesOffre(?TypesOffres $refTypesOffre): static
+    {
+        $this->refTypesOffre = $refTypesOffre;
+
+        return $this;
+    }
+
+    public function getRefCreateur(): ?User
+    {
+        return $this->refCreateur;
+    }
+
+    public function setRefCreateur(?User $refCreateur): static
+    {
+        $this->refCreateur = $refCreateur;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getRefUser(): Collection
+    {
+        return $this->refUser;
+    }
+
+    public function addRefUser(User $refUser): static
+    {
+        if (!$this->refUser->contains($refUser)) {
+            $this->refUser->add($refUser);
+        }
+
+        return $this;
+    }
+
+    public function removeRefUser(User $refUser): static
+    {
+        $this->refUser->removeElement($refUser);
 
         return $this;
     }

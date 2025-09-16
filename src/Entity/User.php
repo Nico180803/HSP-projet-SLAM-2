@@ -84,10 +84,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Evenements::class, mappedBy: 'responsables')]
     private Collection $evenementsResponsable;
 
+    /**
+     * @var Collection<int, Commentaires>
+     */
+    #[ORM\OneToMany(targetEntity: Commentaires::class, mappedBy: 'refUser', orphanRemoval: true)]
+    private Collection $commentaires;
+
+    /**
+     * @var Collection<int, Sujets>
+     */
+    #[ORM\OneToMany(targetEntity: Sujets::class, mappedBy: 'refUser')]
+    private Collection $sujets;
+
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Etablissements $refEtablissement = null;
+
+    /**
+     * @var Collection<int, ContactsEntreprise>
+     */
+    #[ORM\OneToMany(targetEntity: ContactsEntreprise::class, mappedBy: 'refEntreprise', orphanRemoval: true)]
+    private Collection $contactsEntreprises;
+
+    /**
+     * @var Collection<int, Offres>
+     */
+    #[ORM\OneToMany(targetEntity: Offres::class, mappedBy: 'refCreateur', orphanRemoval: true)]
+    private Collection $offres;
+
+    /**
+     * @var Collection<int, Offres>
+     */
+    #[ORM\ManyToMany(targetEntity: Offres::class, mappedBy: 'refUser')]
+    private Collection $candidatures;
+
     public function __construct()
     {
         $this->evenementsInscrits = new ArrayCollection();
         $this->evenementsResponsable = new ArrayCollection();
+        $this->commentaires = new ArrayCollection();
+        $this->sujets = new ArrayCollection();
+        $this->contactsEntreprises = new ArrayCollection();
+        $this->offres = new ArrayCollection();
+        $this->candidatures = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -368,6 +406,165 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->evenementsResponsable->removeElement($evenementsResponsable)) {
             $evenementsResponsable->removeResponsable($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Commentaires>
+     */
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    public function addCommentaire(Commentaires $commentaire): static
+    {
+        if (!$this->commentaires->contains($commentaire)) {
+            $this->commentaires->add($commentaire);
+            $commentaire->setRefUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCommentaire(Commentaires $commentaire): static
+    {
+        if ($this->commentaires->removeElement($commentaire)) {
+            // set the owning side to null (unless already changed)
+            if ($commentaire->getRefUser() === $this) {
+                $commentaire->setRefUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Sujets>
+     */
+    public function getSujets(): Collection
+    {
+        return $this->sujets;
+    }
+
+    public function addSujet(Sujets $sujet): static
+    {
+        if (!$this->sujets->contains($sujet)) {
+            $this->sujets->add($sujet);
+            $sujet->setRefUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSujet(Sujets $sujet): static
+    {
+        if ($this->sujets->removeElement($sujet)) {
+            // set the owning side to null (unless already changed)
+            if ($sujet->getRefUser() === $this) {
+                $sujet->setRefUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getRefEtablissement(): ?Etablissements
+    {
+        return $this->refEtablissement;
+    }
+
+    public function setRefEtablissement(?Etablissements $refEtablissement): static
+    {
+        $this->refEtablissement = $refEtablissement;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ContactsEntreprise>
+     */
+    public function getContactsEntreprises(): Collection
+    {
+        return $this->contactsEntreprises;
+    }
+
+    public function addContactsEntreprise(ContactsEntreprise $contactsEntreprise): static
+    {
+        if (!$this->contactsEntreprises->contains($contactsEntreprise)) {
+            $this->contactsEntreprises->add($contactsEntreprise);
+            $contactsEntreprise->setRefEntreprise($this);
+        }
+
+        return $this;
+    }
+
+    public function removeContactsEntreprise(ContactsEntreprise $contactsEntreprise): static
+    {
+        if ($this->contactsEntreprises->removeElement($contactsEntreprise)) {
+            // set the owning side to null (unless already changed)
+            if ($contactsEntreprise->getRefEntreprise() === $this) {
+                $contactsEntreprise->setRefEntreprise(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Offres>
+     */
+    public function getOffres(): Collection
+    {
+        return $this->offres;
+    }
+
+    public function addOffre(Offres $offre): static
+    {
+        if (!$this->offres->contains($offre)) {
+            $this->offres->add($offre);
+            $offre->setRefCreateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeOffre(Offres $offre): static
+    {
+        if ($this->offres->removeElement($offre)) {
+            // set the owning side to null (unless already changed)
+            if ($offre->getRefCreateur() === $this) {
+                $offre->setRefCreateur(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Offres>
+     */
+    public function getCandidatures(): Collection
+    {
+        return $this->candidatures;
+    }
+
+    public function addCandidature(Offres $candidature): static
+    {
+        if (!$this->candidatures->contains($candidature)) {
+            $this->candidatures->add($candidature);
+            $candidature->addRefUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCandidature(Offres $candidature): static
+    {
+        if ($this->candidatures->removeElement($candidature)) {
+            $candidature->removeRefUser($this);
         }
 
         return $this;
