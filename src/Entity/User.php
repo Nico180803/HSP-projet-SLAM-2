@@ -75,14 +75,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Evenements>
      */
-    #[ORM\ManyToMany(targetEntity: Evenements::class, mappedBy: 'inscrits')]
+    #[ORM\ManyToMany(targetEntity: Evenements::class, mappedBy: 'inscrits', )]
     private Collection $evenementsInscrits;
-
-    /**
-     * @var Collection<int, Evenements>
-     */
-    #[ORM\ManyToMany(targetEntity: Evenements::class, mappedBy: 'responsables')]
-    private Collection $evenementsResponsable;
 
     /**
      * @var Collection<int, Commentaires>
@@ -117,6 +111,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Offres::class, mappedBy: 'refUser')]
     private Collection $candidatures;
 
+    /**
+     * @var Collection<int, UserEvenement>
+     */
+    #[ORM\OneToMany(targetEntity: UserEvenement::class, mappedBy: 'refUser', orphanRemoval: true)]
+    private Collection $userEvenements;
+
     public function __construct()
     {
         $this->evenementsInscrits = new ArrayCollection();
@@ -126,6 +126,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->contactsEntreprises = new ArrayCollection();
         $this->offres = new ArrayCollection();
         $this->candidatures = new ArrayCollection();
+        $this->userEvenements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -392,24 +393,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->evenementsResponsable;
     }
 
-    public function addEvenementsResponsable(Evenements $evenementsResponsable): static
-    {
-        if (!$this->evenementsResponsable->contains($evenementsResponsable)) {
-            $this->evenementsResponsable->add($evenementsResponsable);
-            $evenementsResponsable->addResponsable($this);
-        }
-
-        return $this;
-    }
-
-    public function removeEvenementsResponsable(Evenements $evenementsResponsable): static
-    {
-        if ($this->evenementsResponsable->removeElement($evenementsResponsable)) {
-            $evenementsResponsable->removeResponsable($this);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Commentaires>
@@ -565,6 +548,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if ($this->candidatures->removeElement($candidature)) {
             $candidature->removeRefUser($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserEvenement>
+     */
+    public function getUserEvenements(): Collection
+    {
+        return $this->userEvenements;
+    }
+
+    public function addUserEvenement(UserEvenement $userEvenement): static
+    {
+        if (!$this->userEvenements->contains($userEvenement)) {
+            $this->userEvenements->add($userEvenement);
+            $userEvenement->setRefUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserEvenement(UserEvenement $userEvenement): static
+    {
+        if ($this->userEvenements->removeElement($userEvenement)) {
+            // set the owning side to null (unless already changed)
+            if ($userEvenement->getRefUser() === $this) {
+                $userEvenement->setRefUser(null);
+            }
         }
 
         return $this;
