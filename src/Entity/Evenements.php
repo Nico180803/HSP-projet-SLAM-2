@@ -47,22 +47,19 @@ class Evenements
     #[ORM\JoinColumn(nullable: false)]
     private ?TypesEvenements $refTypesEvenement = null;
 
-    /**
-     * @var Collection<int, User>
-     */
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evenementsInscrits')]
-    private Collection $inscrits;
+
 
     /**
-     * @var Collection<int, User>
+     * @var Collection<int, UserEvenement>
      */
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evenementsResponsable')]
-    private Collection $responsables;
+    #[ORM\OneToMany(targetEntity: UserEvenement::class, mappedBy: 'refEvenement', orphanRemoval: true)]
+    private Collection $userEvenements;
 
     public function __construct()
     {
         $this->inscrits = new ArrayCollection();
         $this->responsables = new ArrayCollection();
+        $this->userEvenements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -234,6 +231,36 @@ class Evenements
     public function removeResponsable(User $responsable): static
     {
         $this->responsables->removeElement($responsable);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserEvenement>
+     */
+    public function getUserEvenements(): Collection
+    {
+        return $this->userEvenements;
+    }
+
+    public function addUserEvenement(UserEvenement $userEvenement): static
+    {
+        if (!$this->userEvenements->contains($userEvenement)) {
+            $this->userEvenements->add($userEvenement);
+            $userEvenement->setRefEvenement($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserEvenement(UserEvenement $userEvenement): static
+    {
+        if ($this->userEvenements->removeElement($userEvenement)) {
+            // set the owning side to null (unless already changed)
+            if ($userEvenement->getRefEvenement() === $this) {
+                $userEvenement->setRefEvenement(null);
+            }
+        }
 
         return $this;
     }
