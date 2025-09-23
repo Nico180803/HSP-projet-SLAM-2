@@ -1,20 +1,57 @@
-{% extends 'base.html.twig' %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Carte des établissements</title>
 
-{% block title %}Hello MapController!{% endblock %}
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <style>
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+    </style>
+</head>
+<body>
 
-{% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+<h1 style="text-align: center;">Carte des établissements</h1>
+<div id="map"></div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin="">
+</script>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/wamp64/www/SYMFONY/HSP-projet-SLAM-2/src/Controller/MapController.php</code></li>
-        <li>Your template at <code>C:/wamp64/www/SYMFONY/HSP-projet-SLAM-2/templates/map/index.html.twig</code></li>
-    </ul>
-</div>
-{% endblock %}
+<script>
+    // Initialisation de la carte
+    var map = L.map('map').setView([46.5, 2.5], 6);
+
+    // Fond OpenStreetMap
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Récupération des établissements envoyés par Symfony
+    var etablissements = {{ etablissements|json_encode|raw }};
+
+    // Ajout des marqueurs
+    etablissements.forEach(function(etab) {
+        if (etab.latitude && etab.longitude) {
+            L.marker([etab.latitude, etab.longitude])
+                .addTo(map)
+                .bindPopup(
+                    `<b>${etab.nbRue} ${etab.rue}</b><br>
+                     ${etab.cp} ${etab.ville}<br>
+                     📧 ${etab.mail}`
+                );
+        }
+    });
+</script>
+
+</body>
+</html>
