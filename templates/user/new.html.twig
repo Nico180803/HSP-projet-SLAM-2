@@ -5,7 +5,62 @@
 {% block body %}
     <h1>Create new User</h1>
 
-    {{ include('user/_form.html.twig') }}
+
+    {{ form_errors(form) }}
+
+    {{ form_start(form) }}
+    {{ form_row(form.role) }}
+    {{ form_row(form.nom) }}
+    {{ form_row(form.prenom) }}
+    {{ form_row(form.email) }}
+    {{ form_row(form.password, {
+        label: 'Mot de passe'
+    }) }}
+
+    <div id="etudiant-fields" class="role-group" style="display:none;">
+        {{ form_row(form.cv) }}
+        {{ form_row(form.formation) }}
+    </div>
+
+    <div id="prof-fields" class="role-group" style="display:none;">
+        {{ form_row(form.specialite) }}
+    </div>
+
+    <div id="entreprise-fields" class="role-group" style="display:none;">
+        {{ form_row(form.cpEntreprise) }}
+        {{ form_row(form.rueEntreprise) }}
+        {{ form_row(form.villeEntreprise) }}
+        {{ form_row(form.nb_rueEntreprise) }}
+        {{ form_row(form.pays) }}
+    </div>
+
+    <button type="submit" class="btn">S'inscrire</button>
+    {{ form_end(form) }}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const roleInputs = document.querySelectorAll('input[name$="[role]"]');
+            const etudiantFields = document.getElementById('etudiant-fields');
+            const profFields = document.getElementById('prof-fields');
+            const entrepriseFields = document.getElementById('entreprise-fields');
+
+            function updateFields(role) {
+                etudiantFields.style.display = role === 'ROLE_USER' ? 'block' : 'none';
+                profFields.style.display = role === 'ROLE_PROF' ? 'block' : 'none';
+                entrepriseFields.style.display = role === 'ROLE_ENTREPRISE' ? 'block' : 'none';
+            }
+
+            roleInputs.forEach(input => {
+                input.addEventListener('change', function () {
+                    updateFields(this.value);
+                });
+
+                if (input.checked) {
+                    updateFields(input.value);
+                }
+            });
+        });
+    </script>
 
     <a href="{{ path('app_user_index') }}">back to list</a>
 {% endblock %}

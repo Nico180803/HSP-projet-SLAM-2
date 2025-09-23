@@ -18,13 +18,13 @@ class UserType extends AbstractType
     {
         $builder
             ->add('email')
-            ->add('roles', ChoiceType::class, [
+            ->add('role', ChoiceType::class, [
                 'choices' => [
                     'Etudiant' => 'ROLE_USER',
                     'Professeur' => 'ROLE_PROF',
                     'Entreprise' => 'ROLE_ENTREPRISE',
                 ],
-                'multiple' => true,
+                'multiple' => false,
                 'expanded' => true,
 
             ])
@@ -39,7 +39,6 @@ class UserType extends AbstractType
             ->add('pays')
             ->add('formation')
             ->add('EstValide')
-            ->add('date_creation')
             ->add('nb_rueEntreprise')
             ->add('refEtablissement', EntityType::class, [
                 'class' => Etablissements::class,
