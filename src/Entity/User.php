@@ -68,7 +68,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?bool $EstValide = null;
 
-    #[ORM\Column]
+    #[ORM\Column(nullable: true)]
     private ?\DateTime $date_creation = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -77,8 +77,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Evenements>
      */
-    #[ORM\ManyToMany(targetEntity: Evenements::class, mappedBy: 'inscrits', )]
-    private Collection $evenementsInscrits;
 
     /**
      * @var Collection<int, Commentaires>
@@ -123,7 +121,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->evenementsInscrits = new ArrayCollection();
         $this->evenementsResponsable = new ArrayCollection();
         $this->commentaires = new ArrayCollection();
         $this->sujets = new ArrayCollection();
@@ -377,29 +374,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Evenements>
      */
-    public function getEvenementsInscrits(): Collection
-    {
-        return $this->evenementsInscrits;
-    }
 
-    public function addEvenement(Evenements $evenement): static
-    {
-        if (!$this->evenementsInscrits->contains($evenement)) {
-            $this->evenementsInscrits->add($evenement);
-            $evenement->addUser($this);
-        }
 
-        return $this;
-    }
-
-    public function removeEvenement(Evenements $evenement): static
-    {
-        if ($this->evenementsInscrits->removeElement($evenement)) {
-            $evenement->removeUser($this);
-        }
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Evenements>
