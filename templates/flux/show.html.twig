@@ -3,24 +3,685 @@
 {% block title %}Flux{% endblock %}
 
 {% block body %}
-    <h1>Flux</h1>
+    <div class="min-h-screen flex flex-col">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+        <style>
+            /* Variables CSS */
+            :root {
+                --color-blue-50: #eff6ff;
+                --color-blue-700: #1d4ed8;
+                --color-blue-800: #1e40af;
+                --color-blue-900: #1e3a8a;
+                --color-gray-50: #f9fafb;
+                --color-gray-100: #f3f4f6;
+                --color-gray-200: #e5e7eb;
+                --color-gray-300: #d1d5db;
+                --color-gray-500: #6b7280;
+                --color-gray-600: #4b5563;
+                --color-gray-700: #374151;
+                --color-gray-800: #1f2937;
+                --color-white: #ffffff;
+                --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+                --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            }
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ flux.id }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ flux.titre }}</td>
-            </tr>
-        </tbody>
-    </table>
+            /* Reset et base */
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-    <a href="{{ path('app_flux_index') }}">back to list</a>
+            body {
+                font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+                line-height: 1.5;
+                color: var(--color-gray-700);
+                background-color: var(--color-gray-50);
+            }
 
-    <a href="{{ path('app_flux_edit', {'id': flux.id}) }}">edit</a>
+            /* Layout utilitaires */
+            .min-h-screen {
+                min-height: 100vh;
+            }
 
-    {{ include('flux/_delete_form.html.twig') }}
+            .flex {
+                display: flex;
+            }
+
+            .flex-col {
+                flex-direction: column;
+            }
+
+            .flex-1 {
+                flex: 1;
+            }
+
+            .items-center {
+                align-items: center;
+            }
+
+            .justify-between {
+                justify-content: space-between;
+            }
+
+            .space-x-6 > * + * {
+                margin-left: 1.5rem;
+            }
+
+            .space-x-4 > * + * {
+                margin-left: 1rem;
+            }
+
+            .space-x-3 > * + * {
+                margin-left: 0.75rem;
+            }
+
+            .space-y-3 > * + * {
+                margin-top: 0.75rem;
+            }
+
+            .space-y-4 > * + * {
+                margin-top: 1rem;
+            }
+
+            .space-y-6 > * + * {
+                margin-top: 1.5rem;
+            }
+
+            .space-y-2 > * + * {
+                margin-top: 0.5rem;
+            }
+
+            .grid {
+                display: grid;
+            }
+
+            .gap-8 {
+                gap: 2rem;
+            }
+
+            /* Container */
+            .max-w-7xl {
+                max-width: 80rem;
+            }
+
+            .max-w-4xl {
+                max-width: 56rem;
+            }
+
+            .mx-auto {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            /* Padding */
+            .px-6 {
+                padding-left: 1.5rem;
+                padding-right: 1.5rem;
+            }
+
+            .px-4 {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+
+            .px-3 {
+                padding-left: 0.75rem;
+                padding-right: 0.75rem;
+            }
+
+            .py-4 {
+                padding-top: 1rem;
+                padding-bottom: 1rem;
+            }
+
+            .py-8 {
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+
+            .py-3 {
+                padding-top: 0.75rem;
+                padding-bottom: 0.75rem;
+            }
+
+            .py-2 {
+                padding-top: 0.5rem;
+                padding-bottom: 0.5rem;
+            }
+
+            .p-6 {
+                padding: 1.5rem;
+            }
+
+            .p-4 {
+                padding: 1rem;
+            }
+
+            /* Margin */
+            .mb-2 {
+                margin-bottom: 0.5rem;
+            }
+
+            .mb-3 {
+                margin-bottom: 0.75rem;
+            }
+
+            .mb-4 {
+                margin-bottom: 1rem;
+            }
+
+            .mb-6 {
+                margin-bottom: 1.5rem;
+            }
+
+            .mt-6 {
+                margin-top: 1.5rem;
+            }
+
+            .mt-auto {
+                margin-top: auto;
+            }
+
+            /* Background */
+            .bg-white {
+                background-color: var(--color-white);
+            }
+
+            .bg-gray-50 {
+                background-color: var(--color-gray-50);
+            }
+
+            .bg-blue-700 {
+                background-color: var(--color-blue-700);
+            }
+
+            .bg-blue-800 {
+                background-color: var(--color-blue-800);
+            }
+
+            .bg-blue-900 {
+                background-color: var(--color-blue-900);
+            }
+
+            /* Text */
+            .text-2xl {
+                font-size: 1.5rem;
+                line-height: 2rem;
+            }
+
+            .text-3xl {
+                font-size: 1.875rem;
+                line-height: 2.25rem;
+            }
+
+            .text-xl {
+                font-size: 1.25rem;
+                line-height: 1.75rem;
+            }
+
+            .text-sm {
+                font-size: 0.875rem;
+                line-height: 1.25rem;
+            }
+
+            .text-lg {
+                font-size: 1.125rem;
+                line-height: 1.75rem;
+            }
+
+            .font-bold {
+                font-weight: 700;
+            }
+
+            .font-semibold {
+                font-weight: 600;
+            }
+
+            .font-medium {
+                font-weight: 500;
+            }
+
+            .text-blue-700 {
+                color: var(--color-blue-700);
+            }
+
+            .text-blue-800 {
+                color: var(--color-blue-800);
+            }
+
+            .text-gray-500 {
+                color: var(--color-gray-500);
+            }
+
+            .text-gray-600 {
+                color: var(--color-gray-600);
+            }
+
+            .text-gray-700 {
+                color: var(--color-gray-700);
+            }
+
+            .text-gray-800 {
+                color: var(--color-gray-800);
+            }
+
+            .text-white {
+                color: var(--color-white);
+            }
+
+            .text-gray-200 {
+                color: var(--color-gray-200);
+            }
+
+            .text-gray-300 {
+                color: var(--color-gray-300);
+            }
+
+            /* Shadow */
+            .shadow-md {
+                box-shadow: var(--shadow-md);
+            }
+
+            .shadow-lg {
+                box-shadow: var(--shadow-lg);
+            }
+
+            /* Border */
+            .border {
+                border: 1px solid;
+            }
+
+            .border-gray-300 {
+                border-color: var(--color-gray-300);
+            }
+
+            .border-t {
+                border-top: 1px solid var(--color-gray-200);
+            }
+
+            .border-b {
+                border-bottom: 1px solid var(--color-gray-200);
+            }
+
+            .rounded {
+                border-radius: 0.25rem;
+            }
+
+            .rounded-lg {
+                border-radius: 0.5rem;
+            }
+
+            .rounded-2xl {
+                border-radius: 1rem;
+            }
+
+            /* Position */
+            .sticky {
+                position: sticky;
+            }
+
+            .top-0 {
+                top: 0;
+            }
+
+            .z-50 {
+                z-index: 50;
+            }
+
+            /* Display */
+            .hidden {
+                display: none !important;
+            }
+
+            .block {
+                display: block;
+            }
+
+            /* Width */
+            .w-full {
+                width: 100%;
+            }
+
+            /* Hover effects */
+            .hover\:text-blue-700:hover {
+                color: var(--color-blue-700);
+            }
+
+            .hover\:bg-blue-800:hover {
+                background-color: var(--color-blue-800);
+            }
+
+            .hover\:bg-gray-50:hover {
+                background-color: var(--color-gray-50);
+            }
+
+            .hover\:underline:hover {
+                text-decoration: underline;
+            }
+
+            .hover\:shadow-lg:hover {
+                box-shadow: var(--shadow-lg);
+            }
+
+            /* Transition */
+            .transition-colors {
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+            }
+
+            .transition-all {
+                transition: all 0.15s ease-in-out;
+            }
+
+            /* Form elements */
+            input[type="text"],
+            input[type="email"],
+            textarea {
+                appearance: none;
+            }
+
+            input:focus,
+            textarea:focus {
+                outline: none;
+                border-color: var(--color-blue-700);
+                box-shadow: 0 0 0 3px rgb(29 78 216 / 0.1);
+            }
+
+            .focus\:ring-2:focus {
+                box-shadow: 0 0 0 3px rgb(29 78 216 / 0.1);
+            }
+
+            .focus\:ring-blue-500:focus {
+                --tw-ring-color: rgb(59 130 246 / 0.5);
+            }
+
+            .focus\:border-transparent:focus {
+                border-color: transparent;
+            }
+
+            /* Active state */
+            .active {
+                color: var(--color-blue-700) !important;
+                font-weight: 600;
+            }
+
+            /* Topic styles */
+            .topic-card {
+                background: var(--color-white);
+                border-radius: 1rem;
+                box-shadow: var(--shadow-md);
+                transition: all 0.3s ease;
+            }
+
+            .topic-card:hover {
+                box-shadow: var(--shadow-lg);
+            }
+
+            .topic-header {
+                padding: 1.5rem;
+                border-bottom: 1px solid var(--color-gray-200);
+            }
+
+            .topic-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--color-blue-800);
+                margin-bottom: 0.5rem;
+            }
+
+            .topic-meta {
+                font-size: 0.875rem;
+                color: var(--color-gray-600);
+            }
+
+            .topic-content {
+                padding: 1.5rem;
+                color: var(--color-gray-700);
+                line-height: 1.6;
+            }
+
+            .topic-actions {
+                padding: 1rem 1.5rem;
+                border-top: 1px solid var(--color-gray-200);
+                background: var(--color-gray-50);
+                border-radius: 0 0 1rem 1rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+            .replies-section {
+                background: var(--color-gray-50);
+                padding: 1.5rem;
+                border-top: 1px solid var(--color-gray-200);
+            }
+
+            .reply-card {
+                background: var(--color-white);
+                border: 1px solid var(--color-gray-200);
+                border-radius: 0.5rem;
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .reply-meta {
+                font-size: 0.75rem;
+                color: var(--color-gray-600);
+                margin-bottom: 0.5rem;
+            }
+
+            .reply-content {
+                color: var(--color-gray-700);
+                line-height: 1.5;
+            }
+
+            /* Button styles */
+            .btn {
+                display: inline-block;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                font-weight: 500;
+                text-decoration: none;
+                transition: all 0.15s ease-in-out;
+                border: 1px solid transparent;
+                cursor: pointer;
+                font-size: 0.875rem;
+            }
+
+            .btn-primary {
+                background-color: var(--color-blue-700);
+                color: var(--color-white);
+            }
+
+            .btn-primary:hover {
+                background-color: var(--color-blue-800);
+            }
+
+            .btn-outline {
+                border-color: var(--color-gray-300);
+                color: var(--color-gray-700);
+                background-color: var(--color-white);
+            }
+
+            .btn-outline:hover {
+                background-color: var(--color-gray-50);
+            }
+
+            .btn-small {
+                padding: 0.25rem 0.75rem;
+                font-size: 0.75rem;
+            }
+
+            /* Responsive */
+            @media (min-width: 768px) {
+                .md\:hidden {
+                    display: none !important;
+                }
+
+                .md\:flex {
+                    display: flex;
+                }
+
+                .md\:grid-cols-3 {
+                    grid-template-columns: repeat(3, minmax(0, 1fr));
+                }
+            }
+        </style>
+        <!-- Header -->
+        <header class="bg-white shadow-md sticky top-0 z-50">
+
+            <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                <!-- Logo ou autre contenu ici -->
+            </div>
+        </header>
+
+        <!-- Forum Section -->
+        <main class="flex-1 py-8 bg-gray-50">
+            <div class="max-w-4xl mx-auto px-6">
+                <!-- En-tête du forum -->
+                <div class="bg-white rounded-2xl shadow-md mb-6">
+                    <div class="p-6 border-b">
+                        <h1 class="text-3xl font-bold text-blue-800 mb-2">Forum de Discussion</h1>
+                        <p class="text-gray-600">Échangez avec la communauté</p>
+                    </div>
+
+                    <!-- Bouton "Nouveau Sujet" -->
+                    <div class="p-6">
+                        <button id="btn-nouveau-sujet" class="bg-blue-700 text-white px-6 py-3 rounded font-medium hover:bg-blue-800 transition-colors">
+                            Nouveau Sujet
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Formulaire nouveau sujet (caché au départ) -->
+                <div id="formulaire-nouveau-sujet" class="bg-white rounded-2xl shadow-md mb-6" style="display: none;">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-4">Créer un nouveau sujet</h3>
+                        <form class="space-y-4">
+                            <div>
+                                <label for="topic-title" class="block text-sm font-medium text-gray-700 mb-2">Titre du sujet</label>
+                                <input type="text" id="topic-title" name="title"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="Entrez le titre de votre sujet">
+                            </div>
+                            <div>
+                                <label for="topic-content" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <textarea id="topic-content" name="content" rows="4"
+                                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                          placeholder="Écrivez votre message..."></textarea>
+                            </div>
+
+                            <div class="flex space-x-4">
+                                <button type="submit" class="bg-blue-700 text-white px-6 py-2 rounded font-medium hover:bg-blue-800 transition-colors">
+                                    Publier
+                                </button>
+                                <button type="button" id="btn-annuler" class="border border-gray-300 text-gray-700 px-6 py-2 rounded font-medium hover:bg-gray-50 transition-colors">
+                                    Annuler
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Liste des sujets -->
+                <div class="space-y-6">
+                    <!-- Sujet exemple -->
+                    { }
+                    <div class="topic-card bg-white rounded-2xl shadow-md">
+                        <div class="topic-header p-6 border-b">
+                            <h2 class="topic-title text-xl font-semibold text-blue-800 mb-2">Bienvenue sur le forum</h2>
+                            <div class="topic-meta text-sm text-gray-600">
+                                Par <strong>Admin</strong> • Il y a 2 jours • 3 réponses
+                            </div>
+                        </div>
+                        <div class="topic-content p-6 text-gray-700">
+                            Ceci est le premier sujet du forum. N'hésitez pas à vous présenter et à partager vos expériences ! Cette plateforme est conçue pour faciliter les échanges entre médecins, étudiants et entreprises partenaires.
+                        </div>
+                        <div class="topic-actions p-4 bg-gray-50 border-t flex gap-4">
+                            <button class="btn btn-outline btn-small">Répondre</button>
+                            <button class="btn btn-outline btn-small">Voir les réponses (3)</button>
+                        </div>
+
+                        <!-- Section réponses -->
+                        <div class="replies-section bg-gray-50 p-6 border-t">
+                            <h4 class="font-medium text-gray-800 mb-4">Réponses (3)</h4>
+
+                            <div class="reply-card mb-4 bg-white border border-gray-200 rounded-lg p-4">
+                                <div class="reply-meta text-xs text-gray-600 mb-2">
+                                    <strong>Marie Dubois</strong> • Il y a 1 jour
+                                </div>
+                                <div class="reply-content text-gray-700">
+                                    Merci pour cet accueil ! Hâte de découvrir cette communauté et d'échanger avec d'autres professionnels de santé.
+                                </div>
+                            </div>
+
+                            <div class="reply-card mb-4 bg-white border border-gray-200 rounded-lg p-4">
+                                <div class="reply-meta text-xs text-gray-600 mb-2">
+                                    <strong>Pierre Martin</strong> • Il y a 12 heures
+                                </div>
+                                <div class="reply-content text-gray-700">
+                                    Parfait ! Je suis étudiant en médecine et je cherche des conseils pour mes stages. Cette plateforme semble idéale.
+                                </div>
+                            </div>
+
+                            <div class="reply-card mb-4 bg-white border border-gray-200 rounded-lg p-4">
+                                <div class="reply-meta text-xs text-gray-600 mb-2">
+                                    <strong>Dr. Sophie Laurent</strong> • Il y a 8 heures
+                                </div>
+                                <div class="reply-content text-gray-700">
+                                    Bienvenue à tous ! N'hésitez pas à poser vos questions, nous sommes là pour vous aider dans votre parcours.
+                                </div>
+                            </div>
+
+                            <!-- Formulaire de réponse -->
+                            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-3">Ajouter une réponse</h5>
+                                <form class="space-y-3">
+                                    <textarea rows="3"
+                                              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                              placeholder="Écrivez votre réponse..."></textarea>
+                                    <div class="flex items-center space-x-3">
+                                        <input type="text"
+                                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                               placeholder="Votre nom">
+                                        <button type="submit" class="btn btn-primary btn-small">Répondre</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-blue-900 text-white py-8 mt-auto text-center">
+
+        </footer>
+    </div>
+
+    <!-- JavaScript logique pour le compteur -->
+    <script>
+        let compteur = 0;
+
+        function incrementer() {
+            compteur++;
+            if (compteur === 1) {
+                document.getElementById("formulaire-nouveau-sujet").style.display = "block";
+            }
+        }
+
+        function resetFormulaire() {
+            compteur = 0;
+            document.getElementById("formulaire-nouveau-sujet").style.display = "none";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const btnNouveauSujet = document.getElementById("btn-nouveau-sujet");
+            const btnAnnuler = document.getElementById("btn-annuler");
+
+            btnNouveauSujet.addEventListener("click", incrementer);
+            btnAnnuler.addEventListener("click", resetFormulaire);
+        });
+    </script>
 {% endblock %}

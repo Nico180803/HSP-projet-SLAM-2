@@ -47,6 +47,7 @@ final class FluxController extends AbstractController
     {
         return $this->render('flux/show.html.twig', [
             'flux' => $flux,
+            'sujets' => $flux->getSujets(),
         ]);
     }
 
