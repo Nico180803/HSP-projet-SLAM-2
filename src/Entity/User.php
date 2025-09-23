@@ -119,6 +119,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: UserEvenement::class, mappedBy: 'refUser', orphanRemoval: true)]
     private Collection $userEvenements;
 
+    private $evenementsResponsable;
+
     public function __construct()
     {
         $this->evenementsInscrits = new ArrayCollection();
@@ -145,6 +147,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->email = $email;
 
+        return $this;
+    }
+
+    // Ne sera pas persisté en BDD, juste pour le formulaire
+    public function getRole(): ?string
+    {
+        return $this->roles[0] ?? null;
+    }
+
+    public function setRole(string $role): self
+    {
+        $this->roles = [$role];
         return $this;
     }
 
