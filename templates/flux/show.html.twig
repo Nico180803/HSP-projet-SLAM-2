@@ -4,7 +4,7 @@
 
 {% block body %}
     <div class="min-h-screen flex flex-col">
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
         <style>
             /* Variables CSS */
             :root {
@@ -586,53 +586,37 @@
                 <!-- Liste des sujets -->
                 <div class="space-y-6">
                     <!-- Sujet exemple -->
-                    { }
+                    {% for sujet in sujets %}
                     <div class="topic-card bg-white rounded-2xl shadow-md">
                         <div class="topic-header p-6 border-b">
                             <h2 class="topic-title text-xl font-semibold text-blue-800 mb-2">Bienvenue sur le forum</h2>
                             <div class="topic-meta text-sm text-gray-600">
-                                Par <strong>Admin</strong> • Il y a 2 jours • 3 réponses
+                                Par {{ sujet.refUser }} • {{ sujet.commentaires|length }} réponses
                             </div>
                         </div>
                         <div class="topic-content p-6 text-gray-700">
-                            Ceci est le premier sujet du forum. N'hésitez pas à vous présenter et à partager vos expériences ! Cette plateforme est conçue pour faciliter les échanges entre médecins, étudiants et entreprises partenaires.
+                            {{ sujet.message }}
                         </div>
                         <div class="topic-actions p-4 bg-gray-50 border-t flex gap-4">
                             <button class="btn btn-outline btn-small">Répondre</button>
-                            <button class="btn btn-outline btn-small">Voir les réponses (3)</button>
+                            <button class="btn btn-outline btn-small">Voir les réponses ({{ sujet.commentaires|length }})</button>
                         </div>
-
+                        {% for commentaire in sujet.commentaires %}
                         <!-- Section réponses -->
                         <div class="replies-section bg-gray-50 p-6 border-t">
-                            <h4 class="font-medium text-gray-800 mb-4">Réponses (3)</h4>
+                            <h4 class="font-medium text-gray-800 mb-4">Réponses ({{ sujet.commentaires|length }})</h4>
 
                             <div class="reply-card mb-4 bg-white border border-gray-200 rounded-lg p-4">
                                 <div class="reply-meta text-xs text-gray-600 mb-2">
-                                    <strong>Marie Dubois</strong> • Il y a 1 jour
+                                    <strong>{{ commentaire.refUser }}</strong>
                                 </div>
                                 <div class="reply-content text-gray-700">
-                                    Merci pour cet accueil ! Hâte de découvrir cette communauté et d'échanger avec d'autres professionnels de santé.
+                                   {{ commentaire.reponse }}
                                 </div>
                             </div>
 
-                            <div class="reply-card mb-4 bg-white border border-gray-200 rounded-lg p-4">
-                                <div class="reply-meta text-xs text-gray-600 mb-2">
-                                    <strong>Pierre Martin</strong> • Il y a 12 heures
-                                </div>
-                                <div class="reply-content text-gray-700">
-                                    Parfait ! Je suis étudiant en médecine et je cherche des conseils pour mes stages. Cette plateforme semble idéale.
-                                </div>
-                            </div>
 
-                            <div class="reply-card mb-4 bg-white border border-gray-200 rounded-lg p-4">
-                                <div class="reply-meta text-xs text-gray-600 mb-2">
-                                    <strong>Dr. Sophie Laurent</strong> • Il y a 8 heures
-                                </div>
-                                <div class="reply-content text-gray-700">
-                                    Bienvenue à tous ! N'hésitez pas à poser vos questions, nous sommes là pour vous aider dans votre parcours.
-                                </div>
-                            </div>
-
+                            {% endfor %}
                             <!-- Formulaire de réponse -->
                             <div class="mt-6 p-4 bg-gray-50 rounded-lg">
                                 <h5 class="font-medium text-gray-800 mb-3">Ajouter une réponse</h5>
@@ -641,15 +625,16 @@
                                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                                               placeholder="Écrivez votre réponse..."></textarea>
                                     <div class="flex items-center space-x-3">
-                                        <input type="text"
-                                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
-                                               placeholder="Votre nom">
+                                        <button class="btn btn-primary btn-small">Annuler</button>
                                         <button type="submit" class="btn btn-primary btn-small">Répondre</button>
                                     </div>
                                 </form>
                             </div>
                         </div>
+
                     </div>
+                    {% endfor %}
+
                 </div>
             </div>
         </main>
