@@ -30,6 +30,9 @@ final class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $user->setDateCreation(new \DateTime());
+
             $entityManager->persist($user);
             $entityManager->flush();
 
