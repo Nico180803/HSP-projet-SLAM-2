@@ -770,17 +770,11 @@
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => {
-                            if (!response.ok) throw new Error('Erreur lors de l\'envoi');
-                            return response.json();
-                        })
+
                         .then(data => {
                             window.location.reload(); // Recharge la page après succès
                         })
-                        .catch(error => {
-                            console.error(error);
-                            alert("Erreur lors de l'envoi de la réponse.");
-                        });
+
                 });
             });
         });
