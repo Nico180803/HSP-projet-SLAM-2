@@ -29,10 +29,10 @@ final class FluxController extends AbstractController
 
         //valeur test car pas user pour le moment STP NICOLASSSSS
         $user = $this->getUser() ?? $entityManager->getRepository(User::class)->find(1);
-
+        //reponse
         if ($reponse && $refSujetId) {
             $sujet = $entityManager->getRepository(Sujets::class)->find($refSujetId);
-            
+
             $commentaire = new Commentaires();
             $commentaire->setReponse($reponse);
             $commentaire->setRefSujet($sujet);
@@ -45,7 +45,7 @@ final class FluxController extends AbstractController
             return $this->json(['message' => 'Commentaire ajouté avec succès !'], 201);
         }
 
-        // 🟦 2. Création d'un sujet
+        //sujet
         if ($titre && $message && $refFluxId) {
             $flux = $entityManager->getRepository(Flux::class)->find($refFluxId);
 
