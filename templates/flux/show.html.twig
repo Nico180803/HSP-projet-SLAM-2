@@ -1,4 +1,4 @@
-{# {% extends 'base.html.twig' %} #}
+{#{% extends 'base.html.twig' %}#}
 {% block title %}{% endblock %}
 
 {% block body %}
@@ -569,10 +569,10 @@
                                           placeholder="Écrivez votre message..."></textarea>
                             </div>
                             <div class="flex space-x-4">
-                                <a href="{{ path('app_flux_new',{titre}) }}"><button type="submit"
+                                <button type="button" id="btn-publier"
                                         class="bg-blue-700 text-white px-6 py-2 rounded font-medium hover:bg-blue-800 transition-colors">
                                     Publier
-                                </button></a>
+                                </button>
                                 <button type="button" id="btn-annuler"
                                         class="border border-gray-300 text-gray-700 px-6 py-2 rounded font-medium hover:bg-gray-50 transition-colors">
                                     Annuler
@@ -630,13 +630,20 @@
                             <div id="form-reply-{{ idSujet }}" class="mt-6 p-4 bg-gray-50 rounded-lg hidden">
                                 <h5 class="font-medium text-gray-800 mb-3">Ajouter une réponse</h5>
                                 <form class="space-y-3">
-                                <textarea rows="3"
+                                <textarea rows="3" id="messageCom"
                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                                           placeholder="Écrivez votre réponse..."></textarea>
                                     <div class="flex items-center space-x-3">
                                         <button type="button" class="btn btn-outline btn-small"
                                                 onclick="cancelReplyForm('{{ idSujet }}')">Annuler</button>
-                                        <button type="submit" class="btn btn-primary btn-small">Répondre</button>
+                                        <button
+                                            class="btn btn-primary btn-small"
+                                            type="button"
+                                            id="btn-repondre"
+                                            data-sujet-id="{{ sujet.id }}"
+                                        >
+                                            Répondre
+                                        </button>
                                     </div>
                                 </form>
                             </div>
@@ -707,5 +714,78 @@
             btnNouveauSujet.addEventListener("click", incrementer);
             btnAnnuler.addEventListener("click", resetFormulaire);
         });
+
     </script>
+    <script>
+        document.getElementById('btn-publier').addEventListener('click', function () {
+            const titre = document.getElementById('topic-title').value;
+            const message = document.getElementById('topic-content').value;
+
+            if (!titre || !message) {
+                alert('Merci de remplir tous les champs.');
+                return;
+            }
+            const urlParts = window.location.pathname.split('/');
+            const fluxId = urlParts[2];
+
+            const formData = new FormData();
+            formData.append('titre', titre);
+            formData.append('message', message);
+            formData.append('refFluxId', fluxId);
+
+            fetch('/flux/new', {
+                method: 'POST',
+                body: formData
+            })
+                .then(data => {
+
+                    window.location.reload(); // Rafraîchir la page
+                })
+
+        });
+
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Récupérer le bouton avec l'ID "btn-repondre"
+            document.querySelectorAll('#btn-repondre').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const sujetId = this.dataset.sujetId;
+                    const reponse = this.closest('form').querySelector('#messageCom').value.trim();
+
+                    if (!reponse) {
+                        alert('Merci de remplir votre réponse.');
+                        return;
+                    }
+
+                    // Récupère l'ID du flux à partir de l'URL (/flux/1)
+                    const fluxId = window.location.pathname.split('/')[2];
+
+                    const formData = new FormData();
+                    formData.append('reponse', reponse);
+                    formData.append('refSujetId', sujetId);
+                    formData.append('refFluxId', fluxId);
+
+                    fetch('/flux/new', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Erreur lors de l\'envoi');
+                            return response.json();
+                        })
+                        .then(data => {
+                            window.location.reload(); // Recharge la page après succès
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            alert("Erreur lors de l'envoi de la réponse.");
+                        });
+                });
+            });
+        });
+    </script>
+
+
+
 {% endblock %}

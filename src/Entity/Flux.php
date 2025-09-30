@@ -33,6 +33,12 @@ class Flux
     {
         return $this->id;
     }
+    public function setId(int $id): static
+    {
+        $this->id = $id;
+
+        return $this;
+    }
 
     public function getTitre(): ?string
     {
@@ -74,5 +80,10 @@ class Flux
         }
 
         return $this;
+
+    }
+    public function __toString(): string
+    {
+        return $this->id;// TODO: Implement __toString() method.
     }
 }
