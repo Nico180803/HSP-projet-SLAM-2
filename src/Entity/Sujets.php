@@ -38,6 +38,9 @@ class Sujets
     #[ORM\JoinColumn(nullable: false)]
     private ?User $refUser = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $titre = null;
+
     public function __construct()
     {
         $this->commentaires = new ArrayCollection();
@@ -134,6 +137,18 @@ class Sujets
     public function setRefUser(?User $refUser): static
     {
         $this->refUser = $refUser;
+
+        return $this;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(string $titre): static
+    {
+        $this->titre = $titre;
 
         return $this;
     }
