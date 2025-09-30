@@ -12,12 +12,27 @@ final class MapController extends AbstractController
     #[Route('/map', name: 'app_map')]
     public function index(EtablissementsRepository $repo): Response
     {
-        // Récupère tous les établissements
         $etablissements = $repo->findAll();
 
+        // Transformation en tableau
+        $data = array_map(function($e) {
+            return [
+                'id' => $e->getId(),
+                'mail' => $e->getMail(),
+                'tel' => $e->getTel(),
+                'nbRue' => $e->getNbRue(),
+                'rue' => $e->getRue(),
+                'ville' => $e->getVille(),
+                'cp' => $e->getCp(),
+                'latitude' => $e->getLatitude(),
+                'longitude' => $e->getLongitude(),
+            ];
+        }, $etablissements);
+
         return $this->render('map/index.html.twig', [
-            'etablissements' => $etablissements,
+            'etablissements' => $data,
         ]);
     }
+
 }
 
