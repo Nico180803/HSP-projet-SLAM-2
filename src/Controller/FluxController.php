@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Flux;
+use App\Entity\Sujets;
 use App\Form\FluxType;
 use App\Repository\FluxRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -14,32 +15,18 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/flux')]
 final class FluxController extends AbstractController
 {
-    #[Route(name: 'app_flux_index', methods: ['GET'])]
-    public function index(FluxRepository $fluxRepository): Response
-    {
-        return $this->render('flux/index.html.twig', [
-            'fluxes' => $fluxRepository->findAll(),
-        ]);
-    }
+
+
 
     #[Route('/new', name: 'app_flux_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $flux = new Flux();
-        $form = $this->createForm(FluxType::class, $flux);
-        $form->handleRequest($request);
+        $sujet = new Sujets();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($flux);
-            $entityManager->flush();
 
-            return $this->redirectToRoute('app_flux_index', [], Response::HTTP_SEE_OTHER);
-        }
 
-        return $this->render('flux/new.html.twig', [
-            'flux' => $flux,
-            'form' => $form,
-        ]);
+
     }
 
     #[Route('/{id}', name: 'app_flux_show', methods: ['GET'])]
@@ -51,32 +38,7 @@ final class FluxController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_flux_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Flux $flux, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(FluxType::class, $flux);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
 
-            return $this->redirectToRoute('app_flux_index', [], Response::HTTP_SEE_OTHER);
-        }
 
-        return $this->render('flux/edit.html.twig', [
-            'flux' => $flux,
-            'form' => $form,
-        ]);
-    }
-
-    #[Route('/{id}', name: 'app_flux_delete', methods: ['POST'])]
-    public function delete(Request $request, Flux $flux, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$flux->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($flux);
-            $entityManager->flush();
-        }
-
-        return $this->redirectToRoute('app_flux_index', [], Response::HTTP_SEE_OTHER);
-    }
 }
