@@ -28,30 +28,45 @@
 </script>
 
 <script>
+    // Récupération des établissements envoyés par Symfony
+    var etablissements = {{ etablissements|json_encode|raw }};
+    console.log(etablissements); // Debug : voir les données dans la console
+
     // Initialisation de la carte
     var map = L.map('map').setView([46.5, 2.5], 6);
+
+    // Définir les limites (France métropolitaine)
+    var franceBounds = [
+        [41.303, -5.142], // Sud-Ouest
+        [51.124, 9.662]   // Nord-Est
+    ];
+    map.setMaxBounds(franceBounds);
+    map.setMinZoom(5); // Empêche de trop dézoomer
+    map.on('drag', function() {
+        map.panInsideBounds(franceBounds, { animate: true });
+    });
 
     // Fond OpenStreetMap
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Récupération des établissements envoyés par Symfony
-    var etablissements = {{ etablissements|json_encode|raw }};
-
     // Ajout des marqueurs
     etablissements.forEach(function(etab) {
         if (etab.latitude && etab.longitude) {
             L.marker([etab.latitude, etab.longitude])
                 .addTo(map)
-                .bindPopup(
-                    `<b>${etab.nbRue} ${etab.rue}</b><br>
-                     ${etab.cp} ${etab.ville}<br>
-                     📧 ${etab.mail}`
-                );
+                .bindPopup(`
+                    <b>${etab.nbRue} ${etab.rue}</b><br>
+                    ${etab.cp} ${etab.ville}<br>
+                    Email : ${etab.mail}
+                    ${etab.tel ? "<br>Téléphone : " + etab.tel : ""}
+                `);
         }
     });
 </script>
 
 </body>
 </html>
+
+
