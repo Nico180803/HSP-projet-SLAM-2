@@ -17,6 +17,11 @@
     * License: https://bootstrapmade.com/license/
     ======================================================== -->
 
+    {# AOS - Animate On Scroll CSS #}
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    {# PureCounter CSS non nécessaire (pur JS) #}
+
     {% block stylesheets %}
 
         <!-- Favicons -->
@@ -52,12 +57,35 @@
     <!-- Main JS File -->
     <script src="{{ asset("js/main.js") }}"></script>
 
+
+        {# PureCounter.js #}
+        <script src="https://cdn.jsdelivr.net/npm/purecounterjs@1.5.0/dist/purecounter_vanilla.js"></script>
+
+        {# AOS.js #}
+        <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+        <script>
+            // Initialisation des librairies après chargement
+            document.addEventListener('DOMContentLoaded', function () {
+                // Init AOS
+                AOS.init({
+                    duration: 600,
+                    easing: 'ease-in-out',
+                    once: true,
+                    mirror: false
+                });
+
+                // Init PureCounter
+                new PureCounter();
+            });
+        </script>
     {% endblock %}
 </head>
 
 
-<body>
+<body style="padding-top: 100px">
     {% block body %}
+
 
         <header id="header" class="header fixed-top">
 
