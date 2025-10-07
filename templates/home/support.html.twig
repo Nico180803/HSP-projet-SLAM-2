@@ -3,7 +3,52 @@
 {% block title %} Nous contacter {% endblock title %}
 
 {% block body %}
+    {{ parent() }}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h3 class="card-title mb-4 text-center">Contacter le support</h3>
 
-{{ form(demande) }}
+                        {# Messages flash (si activés plus tard) #}
+                        {% for label, messages in app.flashes %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endfor %}
 
+                        {{ form_start(demande, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        <div class="mb-3">
+                            {{ form_label(demande.email, 'Votre adresse email', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(demande.email, {'attr': {'class': 'form-control', 'placeholder': 'exemple@domaine.fr'}}) }}
+                            {{ form_errors(demande.email) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(demande.sujet, 'Sujet', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(demande.sujet, {'attr': {'class': 'form-control', 'placeholder': 'Sujet de votre demande'}}) }}
+                            {{ form_errors(demande.sujet) }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form_label(demande.demande, 'Votre message', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(demande.demande, {'attr': {'class': 'form-control', 'rows': 5, 'placeholder': 'Décrivez votre problème ou question...'}}) }}
+                            {{ form_errors(demande.demande) }}
+                        </div>
+
+                        <div class="d-grid">
+                            {{ form_widget(demande.submit, {'attr': {'class': 'btn btn-primary'}}) }}
+                        </div>
+
+                        {{ form_end(demande) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock body %}
