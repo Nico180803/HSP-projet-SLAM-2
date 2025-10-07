@@ -24,6 +24,9 @@ class Flux
     #[ORM\OneToMany(targetEntity: Sujets::class, mappedBy: 'refFlux', orphanRemoval: true)]
     private Collection $sujets;
 
+    #[ORM\Column]
+    private array $role = [];
+
     public function __construct()
     {
         $this->sujets = new ArrayCollection();
@@ -85,5 +88,17 @@ class Flux
     public function __toString(): string
     {
         return $this->id;// TODO: Implement __toString() method.
+    }
+
+    public function getRole(): array
+    {
+        return $this->role;
+    }
+
+    public function setRole(array $role): static
+    {
+        $this->role = $role;
+
+        return $this;
     }
 }

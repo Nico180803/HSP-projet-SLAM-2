@@ -72,9 +72,13 @@ final class FluxController extends AbstractController
     #[Route('/{id}', name: 'app_flux_show', methods: ['GET'])]
     public function show(Flux $flux): Response
     {
+
+        if ($flux->getRole()[0] != $this->getUser()->getRoles()[0] && $flux->getId() != 1) {
+            return $this->redirectToRoute('app_home');
+        }
         return $this->render('flux/show.html.twig', [
             'flux' => $flux,
-            'sujets' => $flux->getSujets(),
+            'sujets' =>array_reverse($flux->getSujets()->toArray()),
 
         ]);
     }
