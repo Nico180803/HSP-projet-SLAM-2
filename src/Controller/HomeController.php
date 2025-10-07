@@ -32,22 +32,20 @@ class HomeController extends AbstractController
             ->add('email', EmailType::class)
             ->add('sujet', TextType::class)
             ->add('demande', TextareaType::class)
-            ->add('submit', SubmitType::class)
+            ->add('submit', SubmitType::class, ['label' => 'Envoyer'])
             ->getForm();
         $form->handleRequest($request);
 
-        //dd($form->getData());
-
-        /*if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $email = (new Email())
                 ->from('support.hsp@hoziodev.fr')
                 ->to($form->getData()['email'])
                 ->subject($form->getData()['sujet'])
                 ->text($form->getData()['demande']);
             $mailer->send($email);
-        }*/
+        }
         return $this->render('home/support.html.twig', [
-            'demande' => $form
+            'demande' => $form->createView(),
         ]);
     }
 }
