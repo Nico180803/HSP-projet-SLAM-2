@@ -1,13 +1,121 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit User{% endblock %}
+{% block title %}Modifier le compte{% endblock %}
 
 {% block body %}
-    <h1>Edit User</h1>
+    <section class="section py-5 bg-light">
+        <div class="container" data-aos="fade-up">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
 
-    {{ include('user/_form.html.twig', {'button_label': 'Update'}) }}
+                    <div class="card shadow-lg">
+                        <div class="card-body">
+                            <h2 class="card-title mb-4">
+                                <i class="bi bi-pencil-square me-2"></i> Modifier le compte
+                            </h2>
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
+                            {{ form_start(form) }}
 
-    {{ include('user/_delete_form.html.twig') }}
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form_row(form.nom, {'attr': {'class': 'mb-3'}}) }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form_row(form.prenom, {'attr': {'class': 'mb-3'}}) }}
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    {{ form_row(form.email, {'attr': {'class': 'mb-3'}}) }}
+                                </div>
+                            </div>
+
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        {{ form_row(form.role, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {# Champs selon le rôle de l'utilisateur qu'on modifie #}
+                            {% set roles = form.vars.data.roles|default([]) %}
+
+                            {% if 'ROLE_USER' in roles or is_granted('ROLE_ADMIN') %}
+                                <hr>
+                                <h5 class="mb-3">Informations Étudiant</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        {{ form_row(form.cv, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                    <div class="col-md-6">
+                                        {{ form_row(form.formation, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if 'ROLE_PROF' in roles or is_granted('ROLE_ADMIN') %}
+                                <hr>
+                                <h5 class="mb-3">Informations Professeur</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        {{ form_row(form.specialite, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            {% if 'ROLE_ENTREPRISE' in roles or is_granted('ROLE_ADMIN') %}
+                                <hr>
+                                <h5 class="mb-3">Informations Entreprise</h5>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        {{ form_row(form.nb_rueEntreprise, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                    <div class="col-md-8">
+                                        {{ form_row(form.rueEntreprise, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-md-4">
+                                        {{ form_row(form.cpEntreprise, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{ form_row(form.villeEntreprise, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                    <div class="col-md-4">
+                                        {{ form_row(form.pays, {'attr': {'class': 'mb-3'}}) }}
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div class="mt-4 d-flex justify-content-between align-items-center">
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('app_user_index') }}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left"></i> Retour à la liste
+                                    </a>
+                                {% endif %}
+
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-primary">
+                                        <i class="bi bi-save me-1"></i> Mettre à jour
+                                    </button>
+
+                                    <form method="post" action="{{ path('app_user_delete', {'id': form.vars.value.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce compte ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ form.vars.value.id) }}">
+                                        <button class="btn btn-danger">
+                                            <i class="bi bi-trash"></i> Supprimer le compte
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
