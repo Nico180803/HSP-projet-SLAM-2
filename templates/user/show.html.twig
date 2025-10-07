@@ -1,84 +1,119 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}User{% endblock %}
 
 {% block body %}
+    {{ parent() }}
 
 
-    <h1>User</h1>
+    <section id="user-profile" class="section py-5 bg-light">
+        <div class="container" data-aos="fade-up">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ user.id }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ user.email }}</td>
-            </tr>
-            <tr>
-                <th>Roles</th>
-                <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
-            </tr>
-            <tr>
-                <th>Password</th>
-                <td>{{ user.password }}</td>
-            </tr>
-            <tr>
-                <th>Nom</th>
-                <td>{{ user.nom }}</td>
-            </tr>
-            <tr>
-                <th>Prenom</th>
-                <td>{{ user.prenom }}</td>
-            </tr>
-            <tr>
-                <th>Cv</th>
-                <td>{{ user.cv }}</td>
-            </tr>
-            <tr>
-                <th>Specialite</th>
-                <td>{{ user.specialite }}</td>
-            </tr>
-            <tr>
-                <th>CpEntreprise</th>
-                <td>{{ user.cpEntreprise }}</td>
-            </tr>
-            <tr>
-                <th>RueEntreprise</th>
-                <td>{{ user.rueEntreprise }}</td>
-            </tr>
-            <tr>
-                <th>VilleEntreprise</th>
-                <td>{{ user.villeEntreprise }}</td>
-            </tr>
-            <tr>
-                <th>Pays</th>
-                <td>{{ user.pays }}</td>
-            </tr>
-            <tr>
-                <th>Formation</th>
-                <td>{{ user.formation }}</td>
-            </tr>
-            <tr>
-                <th>EstValide</th>
-                <td>{{ user.EstValide ? 'Yes' : 'No' }}</td>
-            </tr>
-            <tr>
-                <th>Date_creation</th>
-                <td>{{ user.dateCreation ? user.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Nb_rueEntreprise</th>
-                <td>{{ user.nbRueEntreprise }}</td>
-            </tr>
-        </tbody>
-    </table>
+                    <div class="card shadow-lg">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="me-3">
+                                    <i class="bi bi-person-circle" style="font-size: 3rem;"></i>
+                                </div>
+                                <div>
+                                    <h4 class="card-title mb-0">{{ user.prenom }} {{ user.nom }}</h4>
+                                    {% if is_granted('ROLE_ADMIN') %}
+                                        <small class="text-muted">Utilisateur #{{ user.id }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
 
-    <a href="{{ path('app_user_index') }}">back to list</a>
+                            {# Affiche tout si admin #}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <p><strong>Email:</strong> {{ user.email }}</p>
+                                        <p><strong>Rôles:</strong> {{ user.roles ? user.roles|join(', ') : 'N/A' }}</p>
+                                        <p><strong>Spécialité:</strong> {{ user.specialite }}</p>
+                                        <p><strong>Formation:</strong> {{ user.formation }}</p>
+                                        <p><strong>Validé:</strong>
+                                            {% if user.EstValide %}
+                                                <span class="badge bg-success">Oui</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Non</span>
+                                            {% endif %}
+                                        </p>
+                                        <p><strong>Date de création:</strong> {{ user.dateCreation ? user.dateCreation|date('Y-m-d H:i') : 'N/A' }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>CV:</strong> {{ user.cv }}</p>
+                                        <p><strong>Rue Entreprise:</strong> {{ user.rueEntreprise }} {{ user.nbRueEntreprise }}</p>
+                                        <p><strong>Code Postal:</strong> {{ user.cpEntreprise }}</p>
+                                        <p><strong>Ville:</strong> {{ user.villeEntreprise }}</p>
+                                        <p><strong>Pays:</strong> {{ user.pays }}</p>
+                                    </div>
+                                </div>
 
-    <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
+                                {# Sinon selon les rôles #}
+                            {% else %}
+                                {% set roles = user.roles|default([]) %}
+                                {# Champs communs #}
+                                <hr>
+                                <p><strong>Email:</strong> {{ user.email }}</p>
+                                <p><strong>Validé:</strong>
+                                    {% if user.EstValide %}
+                                        <span class="badge bg-success">Oui</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Non</span>
+                                    {% endif %}
+                                </p>
+                                <hr>
 
-    {{ include('user/_delete_form.html.twig') }}
+                                {% if 'ROLE_USER' in roles %}
+                                    <h5>Informations Étudiant</h5>
+                                    <p><strong>CV:</strong> {{ user.cv }}</p>
+                                    <p><strong>Formation:</strong> {{ user.formation }}</p>
+                                {% endif %}
+
+                                {% if 'ROLE_PROF' in roles %}
+                                    <h5>Informations Professeur</h5>
+                                    <p><strong>Spécialité:</strong> {{ user.specialite }}</p>
+                                {% endif %}
+
+                                {% if 'ROLE_ENTREPRISE' in roles %}
+                                    <h5>Informations Entreprise</h5>
+                                    <p><strong>Adresse:</strong> {{ user.nbRueEntreprise }} {{ user.rueEntreprise }}</p>
+                                    <p><strong>Code Postal:</strong> {{ user.cpEntreprise }}</p>
+                                    <p><strong>Ville:</strong> {{ user.villeEntreprise }}</p>
+                                    <p><strong>Pays:</strong> {{ user.pays }}</p>
+                                {% endif %}
+
+
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between mt-4">
+                                {% if is_granted('ROLE_ADMIN') %}
+                                    <a href="{{ path('app_user_index') }}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left"></i> Retour à la liste
+                                    </a>
+                                {% endif %}
+
+                                <div class="d-flex gap-2">
+                                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-outline-primary">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+
+                                    <form method="post" action="{{ path('app_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce compte ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                        <button class="btn btn-danger">
+                                            <i class="bi bi-trash"></i> Supprimer le compte
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
 {% endblock %}
