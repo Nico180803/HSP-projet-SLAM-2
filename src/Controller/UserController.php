@@ -14,12 +14,22 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/user')]
 final class UserController extends AbstractController
 {
-    #[Route(name: 'app_user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    #[Route('/index/{status}',name: 'app_user_index', methods: ['GET'])]
+    public function index(UserRepository $userRepository, Request $request,$status = 'tous'): Response
     {
         if ($this->isGranted('ROLE_ADMIN')) {
+
+            //$status = $request->query->get('status', 'tous');
+
+            if ($status === 'a_valider') {
+                $users = $userRepository->findBy(['EstValide' => false]);
+            } else {
+                $users = $userRepository->findAll();
+            }
+
             return $this->render('user/index.html.twig', [
-                'users' => $userRepository->findAll(),
+                'users' => $users,
+                'status' => $status
             ]);
         }else{
             return $this->redirectToRoute("app_home");
@@ -91,6 +101,15 @@ final class UserController extends AbstractController
             $entityManager->remove($user);
             $entityManager->flush();
         }
+
+        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/validate', name: 'app_user_validate', methods: ['POST'])]
+    public function validate(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    {
+            $user->setEstValide(true);
+            $entityManager->flush();
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }

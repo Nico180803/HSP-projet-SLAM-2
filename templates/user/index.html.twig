@@ -1,69 +1,103 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-{{ parent() }}
-<section id="users" class="section bg-light py-5">
-    <div class="container" data-aos="fade-up" data-aos-delay="100">
-        <div class="section-header text-center mb-5">
-            <h2 class="section-title" data-aos="fade-up" data-aos-delay="200">Liste des Utilisateurs</h2>
-            <p class="section-subtitle" data-aos="fade-up" data-aos-delay="300">Gestion des comptes utilisateurs de la plateforme</p>
-        </div>
+    {{ parent() }}
+    <section id="users" class="section bg-light py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="section-header text-center mb-5">
+                <h2 class="section-title" data-aos="fade-up" data-aos-delay="200">Liste des Utilisateurs</h2>
 
-        <div class="row">
-            {% for user in users %}
-                <div class="col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ 200 + loop.index * 50 }}">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <i class="bi bi-person-circle me-2"></i>{{ user.prenom }} {{ user.nom }}
-                            </h5>
-                            <p class="card-text mb-2">
-                                <strong>Email:</strong> {{ user.email }}<br>
-                                <strong>Spécialité:</strong> {{ user.specialite }}<br>
-                                <strong>Formation:</strong> {{ user.formation }}<br>
-                                <strong>Validé:</strong>
-                                {% if user.EstValide %}
-                                    <span class="badge bg-success">Oui</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Non</span>
-                                {% endif %}
-                            </p>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="300">Gestion des comptes utilisateurs de la plateforme</p>
+            </div>
+            <div class="text-center mt-4">
+                <a href="{{ path('app_user_new') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="150">
+                    <i class="bi bi-person-plus-fill me-2"></i>Créer un nouvel utilisateur
+                </a>
+            </div>
+            <hr data-aos="fade-up" data-aos-delay="150">
+            <div class="d-flex justify-content-center mb-4" data-aos="fade-up" data-aos-delay="150">
+                <a href="{{ path('app_user_index') }}" class="btn btn-outline-secondary me-2 {{ status is not defined or status != 'a_valider' ? 'active' : '' }}">
+                    Tous les utilisateurs
+                </a>
+                <a href="{{ path('app_user_index', {'status': 'a_valider'}) }}" class="btn btn-outline-danger {{ status == 'a_valider' ? 'active' : '' }}">
+                    Comptes à valider
+                </a>
+            </div>
 
-                            <p class="small text-muted">
-                                <strong>Entreprise:</strong> {{ user.rueEntreprise }}, {{ user.nbRueEntreprise }}<br>
-                                {{ user.cpEntreprise }} {{ user.villeEntreprise }}, {{ user.pays }}
-                            </p>
+            <div class="row">
+                {% for user in users %}
+                    {% set roleLabels = {
+                        'ROLE_ADMIN': 'Administrateur',
+                        'ROLE_PROF': 'Médecin',
+                        'ROLE_USER': 'Utilisateur'
+                    } %}
+                    <div class="col-md-3 col-lg-4 mb-2" data-aos="fade-up" data-aos-delay="{{ 200 + loop.index * 50 }}">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    <i class="bi bi-person-circle me-2"></i>{{ user.prenom }} {{ user.nom }}
+                                </h5>
+                                <p class="card-text mb-2">
+                                    <strong>Role:</strong>
+                                        {% for role in user.roles %}
+                                        <span class="badge bg-primary-subtle text-dark">
+                                             {{ roleLabels[role]|default(role) }}
+                                        </span>
+                                        {% else %}
+                                        <span class="text-muted">Aucun rôle</span>
+                                        {% endfor %}<br>
+                                    <strong>Email:</strong> {{ user.email }}<br>
+                                    <strong>Spécialité:</strong> {{ user.specialite }}<br>
+                                    <strong>Formation:</strong> {{ user.formation }}<br>
+                                    <strong>Validé:</strong>
+                                    {% if user.EstValide %}
+                                        <span class="badge bg-success">Oui</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Non</span>
+                                    {% endif %}
+                                </p>
 
-                            <p class="small text-muted">
-                                <strong>Date de création:</strong> {{ user.dateCreation ? user.dateCreation|date('Y-m-d H:i') : 'N/A' }}
-                            </p>
+                                <p class="small text-muted">
+                                    <strong>Entreprise:</strong> {{ user.rueEntreprise }}, {{ user.nbRueEntreprise }}<br>
+                                    {{ user.cpEntreprise }} {{ user.villeEntreprise }}, {{ user.pays }}
+                                </p>
 
-                            <div class="d-flex justify-content-between">
-                                <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-sm btn-outline-primary">
-                                    <i class="bi bi-eye"></i> Voir
-                                </a>
-                                <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-outline-secondary">
-                                    <i class="bi bi-pencil"></i> Modifier
-                                </a>
+                                <p class="small text-muted">
+                                    <strong>Date de création:</strong> {{ user.dateCreation ? user.dateCreation|date('Y-m-d H:i') : 'N/A' }}
+                                </p>
+
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Voir
+                                    </a>
+
+                                    {% if not user.EstValide %}
+                                        <form method="post" action="{{ path('app_user_validate', {'id': user.id}) }}" style="display:inline-block;" onsubmit="return confirm('Confirmer la validation de ce compte ?');">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('validate' ~ user.id) }}">
+                                            <button class="btn btn-sm btn-success">
+                                                <i class="bi bi-check-circle"></i> Valider
+                                            </button>
+                                        </form>
+                                    {% endif %}
+
+
+                                    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-pencil"></i> Modifier
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            {% else %}
-                <div class="col-12 text-center">
-                    <div class="alert alert-warning" role="alert" data-aos="fade-up">
-                        Aucun utilisateur trouvé.
+                {% else %}
+                    <div class="col-12 text-center">
+                        <div class="alert alert-warning" role="alert" data-aos="fade-up">
+                            Aucun utilisateur trouvé.
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
+                {% endfor %}
+            </div>
 
-        <div class="text-center mt-4">
-            <a href="{{ path('app_user_new') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="400">
-                <i class="bi bi-person-plus-fill me-2"></i>Créer un nouvel utilisateur
-            </a>
         </div>
-    </div>
-</section>
+    </section>
 
 {% endblock %}
