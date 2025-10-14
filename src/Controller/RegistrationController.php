@@ -8,6 +8,7 @@ use App\Security\LoginAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -23,17 +24,37 @@ class RegistrationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var string $plainPassword */
-            $plainPassword = $form->get('plainPassword')->getData();
 
-            // encode the plain password
-            $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            $plainPassword = $form->get('plainPassword')->getData();
+            $user->setPassword(
+                $userPasswordHasher->hashPassword($user, $plainPassword)
+            );
+
+
             $user->setDateCreation(new \DateTime());
+
+            // Handle file upload (CV)
+            /** @var UploadedFile|null $cvFile */
+            $cvFile = $form->get('cv')->getData();
+
+            if ($cvFile) {
+                $newFilename = uniqid().'.'.$cvFile->guessExtension();
+
+
+                    $cvFile->move(
+                        $this->getParameter('cv_directory'), // Destination defined in services.yaml
+                        $newFilename
+                    );
+
+
+                // Store file name in DB
+                $user->setCv($newFilename);
+            }
+
 
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // do anything else you need here, like send an email
 
             return $this->redirectToRoute('app_home');
         }
@@ -42,4 +63,5 @@ class RegistrationController extends AbstractController
             'registrationForm' => $form,
         ]);
     }
+
 }

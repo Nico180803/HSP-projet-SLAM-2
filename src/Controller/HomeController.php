@@ -37,12 +37,17 @@ class HomeController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $email = (new Email())
-                ->from('support.hsp@hoziodev.fr')
-                ->to($form->getData()['email'])
-                ->subject($form->getData()['sujet'])
-                ->text($form->getData()['demande']);
-            $mailer->send($email);
+            try {
+                $email = (new Email())
+                    ->from('support.hsp@hoziodev.fr')
+                    ->to($form->getData()['email'])
+                    ->subject($form->getData()['sujet'])
+                    ->text($form->getData()['demande']);
+                $mailer->send($email);
+                $this->addFlash('success', 'Reussi');
+            }catch (\Exception $e){
+                $this->addFlash('error', 'Erreur lors de l\'envoi du mail : ' . $e->getMessage());
+            }
         }
         return $this->render('home/support.html.twig', [
             'demande' => $form->createView(),
