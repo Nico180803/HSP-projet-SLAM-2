@@ -67,7 +67,14 @@
 
                                 {% if 'ROLE_USER' in roles %}
                                     <h5>Informations Étudiant</h5>
-                                    <p><strong>CV:</strong> {{ user.cv }}</p>
+                                    <p><strong>CV:</strong>
+                                    {% if app.user.cv %}
+                                    <a href="{{ asset('uploads/cv/' ~ app.user.cv) }}" target="_blank" download>
+                                        Télécharger le CV
+                                    </a>
+                                {% else %}
+                                    <p>Pas de CV disponible.</p>
+                                {% endif %}</p>
                                     <p><strong>Formation:</strong> {{ user.formation }}</p>
                                 {% endif %}
 
