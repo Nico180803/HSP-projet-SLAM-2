@@ -1,16 +1,48 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier un événement{% endblock %}
+{% block title %}Modification d'un évènement{% endblock %}
 
 {% block body %}
-    <h1>Modifier un événement</h1>
+    {{ parent() }}
 
-    {% for message in app.flashes('success') %}
-        <p>{{ message }}</p>
-    {% endfor %}
+    <div class="container mt-4" style="max-width: 600px;">
+        <h1 class="mb-3">Modifier un évènement</h1>
 
-    {{ include('evenements/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
 
-    <a href="{{ path('app_evenements_index') }}">Retour à la liste</a>
+        <div class="form-block p-3 border rounded" style="background-color: #f9f9f9;">
+            {{ include('evenements/_form.html.twig', {'button_label': button_label}) }}
+        </div>
+
+        <div class="mt-2">
+            <a href="{{ path('app_evenements_index') }}" class="btn btn-secondary">
+                Revenir à la liste des événements
+            </a>
+        </div>
+    </div>
+
+    <style>
+        .form-block { box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+        input[type="text"], input[type="date"], input[type="time"], textarea, select {
+            width: 100%; padding: 0.4rem 0.6rem; border: 1px solid #ccc; border-radius: 4px;
+            font-size: 0.95rem; box-sizing: border-box; transition: border-color 0.2s ease-in-out;
+        }
+        input:focus, textarea:focus, select:focus { border-color: #007bff; outline: none; }
+        textarea { min-height: 80px; resize: vertical; }
+        label { display: block; margin-bottom: 0.2rem; font-weight: 500; font-size: 0.95rem; }
+        .form-group { margin-bottom: 0.8rem; }
+        h1 { font-size: 1.5rem; font-weight: 500; }
+        .btn { padding: 0.4rem 0.8rem; font-size: 0.95rem; }
+        .alert-success {
+            padding: 0.5rem 0.8rem; margin-bottom: 1rem; border: 1px solid #c3e6cb;
+            background-color: #d4edda; color: #155724; border-radius: 4px;
+        }
+    </style>
 {% endblock %}
-    
+
+
+

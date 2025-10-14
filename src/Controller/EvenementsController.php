@@ -3,13 +3,14 @@
 namespace App\Controller;
 
 use App\Entity\Evenements;
+use App\Entity\UserEvenement;
 use App\Form\EvenementsType;
 use App\Repository\EvenementsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/evenements')]
 final class EvenementsController extends AbstractController
@@ -25,20 +26,36 @@ final class EvenementsController extends AbstractController
     #[Route('/new', name: 'app_evenements_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
+        if (!$this->isGranted('ROLE_PROF') && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Accès réservé aux professeurs ou administrateurs.');
+        }
+
         $evenement = new Evenements();
         $form = $this->createForm(EvenementsType::class, $evenement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Lier l'utilisateur courant comme responsable
+            $userEvenement = new UserEvenement();
+            $userEvenement->setRefUser($this->getUser());
+            $userEvenement->setRefEvenement($evenement);
+            $userEvenement->setIsResponsable(true);
+            $evenement->addUserEvenement($userEvenement);
+
             $entityManager->persist($evenement);
+            $entityManager->persist($userEvenement);
             $entityManager->flush();
+
+            $this->addFlash('success', 'Événement créé avec succès.');
 
             return $this->redirectToRoute('app_evenements_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('evenements/new.html.twig', [
             'evenement' => $evenement,
-            'form' => $form,
+            'form' => $form->createView(),
+            'title' => 'Créer un nouvel événement',
+            'button_label' => 'Créer',
         ]);
     }
 
@@ -53,29 +70,55 @@ final class EvenementsController extends AbstractController
     #[Route('/{id}/edit', name: 'app_evenements_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Evenements $evenement, EntityManagerInterface $entityManager): Response
     {
+        $user = $this->getUser();
+
+        // Vérifie si l'utilisateur est responsable via UserEvenement
+        $isResponsable = $evenement->getUserEvenements()->exists(function($key, $userEvenement) use ($user) {
+            return $userEvenement->getRefUser() === $user && $userEvenement->isResponsable();
+        });
+
+        if (!$this->isGranted('ROLE_ADMIN') && !$isResponsable) {
+            throw $this->createAccessDeniedException('Vous n’avez pas la permission de modifier cet événement.');
+        }
+
         $form = $this->createForm(EvenementsType::class, $evenement);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+            $this->addFlash('success', 'Événement modifié avec succès.');
 
             return $this->redirectToRoute('app_evenements_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('evenements/edit.html.twig', [
             'evenement' => $evenement,
-            'form' => $form,
+            'form' => $form->createView(),
+            'title' => 'Modifier un événement',
+            'button_label' => 'Enregistrer',
         ]);
     }
 
     #[Route('/{id}', name: 'app_evenements_delete', methods: ['POST'])]
     public function delete(Request $request, Evenements $evenement, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$evenement->getId(), $request->getPayload()->getString('_token'))) {
+        $user = $this->getUser();
+
+        $isResponsable = $evenement->getUserEvenements()->exists(function($key, $userEvenement) use ($user) {
+            return $userEvenement->getRefUser() === $user && $userEvenement->isResponsable();
+        });
+
+        if (!$this->isGranted('ROLE_ADMIN') && !$isResponsable) {
+            throw $this->createAccessDeniedException('Vous n’avez pas la permission de supprimer cet événement.');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$evenement->getId(), $request->request->get('_token'))) {
             $entityManager->remove($evenement);
             $entityManager->flush();
+            $this->addFlash('success', 'Événement supprimé avec succès.');
         }
 
         return $this->redirectToRoute('app_evenements_index', [], Response::HTTP_SEE_OTHER);
     }
 }
+

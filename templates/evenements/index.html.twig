@@ -1,51 +1,67 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Evenements index{% endblock %}
+{% block title %}Liste des Événements{% endblock %}
 
 {% block body %}
-    <h1>Evenements index</h1>
+    {{ parent() }}
+    <div class="container py-5">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Titre</th>
-                <th>Description</th>
-                <th>Ville</th>
-                <th>Rue</th>
-                <th>Cp</th>
-                <th>Nb_rue</th>
-                <th>Nb_places</th>
-                <th>Nb_places_dispo</th>
-                <th>Est_valide</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for evenement in evenements %}
-            <tr>
-                <td>{{ evenement.id }}</td>
-                <td>{{ evenement.titre }}</td>
-                <td>{{ evenement.description }}</td>
-                <td>{{ evenement.ville }}</td>
-                <td>{{ evenement.rue }}</td>
-                <td>{{ evenement.cp }}</td>
-                <td>{{ evenement.nbRue }}</td>
-                <td>{{ evenement.nbPlaces }}</td>
-                <td>{{ evenement.nbPlacesDispo }}</td>
-                <td>{{ evenement.estValide ? 'Yes' : 'No' }}</td>
-                <td>
-                    <a href="{{ path('app_evenements_show', {'id': evenement.id}) }}">show</a>
-                    <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}">edit</a>
-                </td>
-            </tr>
+        <div class="bg-white shadow-sm rounded p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h2 class="fw-bold text-primary mb-0">Événements à venir</h2>
+                    <p class="text-muted mb-0">Découvrez les activités de la communauté</p>
+                </div>
+                <a href="{{ path('app_evenements_new') }}" class="btn btn-primary">
+                    Nouvel Événement
+                </a>
+            </div>
+        </div>
+
+        {% if evenements is empty %}
+            <div class="alert alert-warning text-center shadow-sm rounded">
+                Aucun événement n’est disponible pour le moment.
+            </div>
         {% else %}
-            <tr>
-                <td colspan="11">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            <div class="d-flex flex-column gap-4">
+                {% for evenement in evenements %}
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="fw-bold text-primary mb-1">{{ evenement.titre }}</h5>
+                                    <p class="text-muted mb-2">
+                                        {{ evenement.ville }} — {{ evenement.rue ?? 'Adresse non précisée' }}, {{ evenement.cp ?? '' }}
+                                    </p>
+                                    <p class="mb-2">{{ evenement.description|length > 100 ? evenement.description|slice(0, 100) ~ '...' : evenement.description }}</p>
 
-    <a href="{{ path('app_evenements_new') }}">Create new</a>
+                                    <div class="d-flex align-items-center gap-3 mt-2">
+                                    <span class="badge bg-info text-dark">
+                                        {{ evenement.nbPlacesDispo > 0 ? evenement.nbPlacesDispo ~ ' places dispo' : 'Complet' }}
+                                    </span>
+                                        {% if evenement.estValide %}
+                                            <span class="badge bg-success">Validé</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Non validé</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="text-end">
+                                    <a href="{{ path('app_evenements_show', {'id': evenement.id}) }}" class="btn btn-outline-primary btn-sm mb-2 w-100">
+                                        Voir détails
+                                    </a>
+                                    <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}" class="btn btn-outline-warning btn-sm w-100 text-dark">
+                                        Modifier
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}
+
+
