@@ -31,7 +31,7 @@ class RegistrationFormType extends AbstractType
             ->add('prenom')
             ->add('email')
             ->add('cv', FileType::class, [
-                'label' => 'CV (PDF ou Word)',
+                'label' => 'CV (PDF)',
                 'mapped' => false,
                 'required' => false,
                 'constraints' => [
@@ -39,10 +39,9 @@ class RegistrationFormType extends AbstractType
                         'maxSize' => '5M',
                         'mimeTypes' => [
                             'application/pdf',
-                            'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+
                         ],
-                        'mimeTypesMessage' => 'Veuillez uploader un fichier PDF ou Word valide',
+                        'mimeTypesMessage' => 'Veuillez uploader un fichier PDF valide',
                     ])
                 ],
             ])
