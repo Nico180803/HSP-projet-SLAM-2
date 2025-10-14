@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,22 +15,31 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/user')]
 final class UserController extends AbstractController
 {
-    #[Route('/index/{status}',name: 'app_user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository, Request $request,$status = 'tous'): Response
+    #[Route('/index',name: 'app_user_index', methods: ['GET'])]
+    public function index(UserRepository $userRepository,PaginatorInterface $paginator, Request $request): Response
     {
         if ($this->isGranted('ROLE_ADMIN')) {
 
-            //$status = $request->query->get('status', 'tous');
+            $status = $request->query->get('status', 'tous');
 
-            if ($status === 'a_valider') {
-                $users = $userRepository->findBy(['EstValide' => false]);
-            } else {
-                $users = $userRepository->findAll();
+            $search = $request->query->get('search', null);
+            //dump($status);
+            if ($status == "a_valider") {
+                $users = $userRepository->getFilteredNotValidatedUsersQuery($search);
+            }else {
+                $users = $userRepository->getFilteredUsersQuery($search);
             }
+            $pagination = $paginator->paginate(
+                $users,
+                $request->query->getInt('page', 1),
+                6
+            );
+
 
             return $this->render('user/index.html.twig', [
-                'users' => $users,
-                'status' => $status
+                'status' => $status,
+                'pagination' => $pagination,
+                'search' => $search,
             ]);
         }else{
             return $this->redirectToRoute("app_home");
@@ -108,8 +118,8 @@ final class UserController extends AbstractController
     #[Route('/{id}/validate', name: 'app_user_validate', methods: ['POST'])]
     public function validate(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-            $user->setEstValide(true);
-            $entityManager->flush();
+        $user->setEstValide(true);
+        $entityManager->flush();
 
         return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }
