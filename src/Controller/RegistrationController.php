@@ -40,14 +40,12 @@ class RegistrationController extends AbstractController
             if ($cvFile) {
                 $newFilename = uniqid().'.'.$cvFile->guessExtension();
 
-                try {
+
                     $cvFile->move(
                         $this->getParameter('cv_directory'), // Destination defined in services.yaml
                         $newFilename
                     );
-                } catch (FileException $e) {
-                    $this->addFlash('error', 'Erreur lors du téléchargement du fichier.');
-                }
+
 
                 // Store file name in DB
                 $user->setCv($newFilename);
