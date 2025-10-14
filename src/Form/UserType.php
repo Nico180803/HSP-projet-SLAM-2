@@ -38,7 +38,9 @@ class UserType extends AbstractType
             ->add('villeEntreprise')
             ->add('pays')
             ->add('formation')
-            ->add('EstValide')
+            ->add('EstValide', null, [
+                'data' => false,
+            ])
             ->add('nb_rueEntreprise')
             ->add('refEtablissement', EntityType::class, [
                 'class' => Etablissements::class,
