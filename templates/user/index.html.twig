@@ -25,7 +25,13 @@
             </div>
 
             <div class="row">
-                {% for user in users %}
+                <form method="get" action="{{ path('app_user_index') }}" class="mb-4 d-flex" role="search">
+                    <label>
+                        <input type="text" name="search" value="{{ app.request.get('search') }}" class="form-control me-2" placeholder="Rechercher un utilisateur...">
+                    </label>
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </form>
+                {% for user in pagination %}
                     {% set roleLabels = {
                         'ROLE_ADMIN': 'Administrateur',
                         'ROLE_PROF': 'Médecin',
@@ -47,8 +53,6 @@
                                         <span class="text-muted">Aucun rôle</span>
                                         {% endfor %}<br>
                                     <strong>Email:</strong> {{ user.email }}<br>
-                                    <strong>Spécialité:</strong> {{ user.specialite }}<br>
-                                    <strong>Formation:</strong> {{ user.formation }}<br>
                                     <strong>Validé:</strong>
                                     {% if user.EstValide %}
                                         <span class="badge bg-success">Oui</span>
@@ -57,10 +61,6 @@
                                     {% endif %}
                                 </p>
 
-                                <p class="small text-muted">
-                                    <strong>Entreprise:</strong> {{ user.rueEntreprise }}, {{ user.nbRueEntreprise }}<br>
-                                    {{ user.cpEntreprise }} {{ user.villeEntreprise }}, {{ user.pays }}
-                                </p>
 
                                 <p class="small text-muted">
                                     <strong>Date de création:</strong> {{ user.dateCreation ? user.dateCreation|date('Y-m-d H:i') : 'N/A' }}
@@ -95,6 +95,9 @@
                         </div>
                     </div>
                 {% endfor %}
+                <div class="d-flex justify-content-center mt-4">
+                    {{ knp_pagination_render(pagination) }}
+                </div>
             </div>
 
         </div>
