@@ -2,31 +2,49 @@
 
 namespace App\Controller;
 
-
 use App\Repository\EvenementsRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\EtablissementsRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/')]
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(EvenementsRepository $evenementsRepository): Response
+    public function index(EvenementsRepository $evenementsRepository, EtablissementsRepository $etablissementsRepository): Response
     {
-       $evenements = $evenementsRepository->getLastEvenements(3);
+        // Récupérer les derniers événements
+        $evenements = $evenementsRepository->getLastEvenements(3);
 
-        return $this->render('home/index.html.twig',[
-            'evenements' => $evenements]);
+        // Récupérer tous les établissements
+        $etablissements = $etablissementsRepository->findAll();
+
+        $data = array_map(function($e) {
+            return [
+                'id' => $e->getId(),
+                'mail' => $e->getMail(),
+                'tel' => $e->getTel(),
+                'nbRue' => $e->getNbRue(),
+                'rue' => $e->getRue(),
+                'ville' => $e->getVille(),
+                'cp' => $e->getCp(),
+                'latitude' => $e->getLatitude(),
+                'longitude' => $e->getLongitude(),
+            ];
+        }, $etablissements);
+
+        return $this->render('home/index.html.twig', [
+            'evenements' => $evenements,
+            'etablissements' => $data,
+        ]);
     }
 
     #[Route('/support', name: 'app_support')]
@@ -49,10 +67,11 @@ class HomeController extends AbstractController
                     ->text($form->getData()['demande']);
                 $mailer->send($email);
                 $this->addFlash('success', 'Reussi');
-            }catch (\Exception $e){
+            } catch (\Exception $e) {
                 $this->addFlash('error', 'Erreur lors de l\'envoi du mail : ' . $e->getMessage());
             }
         }
+
         return $this->render('home/support.html.twig', [
             'demande' => $form->createView(),
         ]);

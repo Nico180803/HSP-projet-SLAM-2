@@ -41,7 +41,8 @@ class Evenements
     private ?int $nb_places_dispo = null;
 
     #[ORM\Column]
-    private ?bool $est_valide = null;
+    private ?bool $est_valide = false;
+
 
     #[ORM\ManyToOne(inversedBy: 'evenements')]
     #[ORM\JoinColumn(nullable: false)]

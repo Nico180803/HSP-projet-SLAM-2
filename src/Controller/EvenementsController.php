@@ -18,7 +18,7 @@ final class EvenementsController extends AbstractController
     #[Route(name: 'app_evenements_index', methods: ['GET'])]
     public function index(EvenementsRepository $evenementsRepository): Response
     {
-        // 🔒 Les utilisateurs non-admin/prof ne voient que les événements actifs
+        // 🔒 Les utilisateurs non-admin/prof ne voient que les événements validés
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
             $evenements = $evenementsRepository->findBy(['est_valide' => true]);
         } else {
@@ -35,13 +35,18 @@ final class EvenementsController extends AbstractController
     {
         $evenement = new Evenements();
 
-        // Création du formulaire avec l'option 'user_roles' pour gérer la checkbox
+        // Création du formulaire avec l'option 'user_roles'
         $form = $this->createForm(EvenementsType::class, $evenement, [
             'user_roles' => $this->getUser() ? $this->getUser()->getRoles() : [],
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Forcer est_valide à false si l'utilisateur n'est pas admin/prof
+            if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
+                $evenement->setEstValide(false);
+            }
+
             // Lier l'utilisateur courant comme responsable
             $userEvenement = new UserEvenement();
             $userEvenement->setRefUser($this->getUser());
@@ -88,7 +93,8 @@ final class EvenementsController extends AbstractController
             return $userEvenement->getRefUser() === $user && $userEvenement->isResponsable();
         });
 
-        if (!$this->isGranted('ROLE_ADMIN') && !$isResponsable) {
+        // Admins et profs peuvent tout modifier
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$isResponsable) {
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de modifier cet événement.');
         }
 
@@ -121,7 +127,8 @@ final class EvenementsController extends AbstractController
             return $userEvenement->getRefUser() === $user && $userEvenement->isResponsable();
         });
 
-        if (!$this->isGranted('ROLE_ADMIN') && !$isResponsable) {
+        // Admins et profs peuvent tout supprimer
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$isResponsable) {
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de supprimer cet événement.');
         }
 
@@ -134,5 +141,6 @@ final class EvenementsController extends AbstractController
         return $this->redirectToRoute('app_evenements_index', [], Response::HTTP_SEE_OTHER);
     }
 }
+
 
 
