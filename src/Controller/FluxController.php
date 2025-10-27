@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Form\FluxType;
 use App\Repository\FluxRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,16 +71,40 @@ final class FluxController extends AbstractController
 
 
     #[Route('/{id}', name: 'app_flux_show', methods: ['GET'])]
-    public function show(Flux $flux): Response
+    public function show(Flux $flux,FluxRepository $fluxRepository,PaginatorInterface $paginator,Request $request,EntityManagerInterface $entityManager): Response
     {
 
+        if ($this->getUser() == null) {
+            return $this->redirectToRoute('app_home');
+        }
         if ($flux->getRole()[0] != $this->getUser()->getRoles()[0] && $flux->getId() != 1) {
             return $this->redirectToRoute('app_home');
         }
+        $search = $request->query->get('search', null);
+        $sujetRepository = $entityManager->getRepository(Sujets::class);
+        $queryBuilder = $sujetRepository->createQueryBuilder('s')
+            ->where('s.refFlux = :flux')
+            ->setParameter('flux', $flux);
+
+
+        if ($search) {
+            $queryBuilder
+                ->andWhere('LOWER(s.titre) LIKE :search OR LOWER(s.message) LIKE :search')
+                ->setParameter('search', '%' . strtolower($search) . '%');
+        }
+
+        $query = $queryBuilder->getQuery();
+        $query = array_reverse($query->getResult());
+        $pagination = $paginator->paginate(
+            $query,
+            $request->query->getInt('page', 1),
+            6
+        );
         return $this->render('flux/show.html.twig', [
             'flux' => $flux,
             'sujets' =>array_reverse($flux->getSujets()->toArray()),
-
+            'pagination' => $pagination,
+            'search' => $search,
         ]);
     }
 
