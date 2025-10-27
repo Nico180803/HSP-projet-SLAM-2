@@ -18,20 +18,27 @@ final class EvenementsController extends AbstractController
     #[Route(name: 'app_evenements_index', methods: ['GET'])]
     public function index(EvenementsRepository $evenementsRepository): Response
     {
+        // 🔒 Les utilisateurs non-admin/prof ne voient que les événements actifs
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
+            $evenements = $evenementsRepository->findBy(['est_valide' => true]);
+        } else {
+            $evenements = $evenementsRepository->findAll();
+        }
+
         return $this->render('evenements/index.html.twig', [
-            'evenements' => $evenementsRepository->findAll(),
+            'evenements' => $evenements,
         ]);
     }
 
     #[Route('/new', name: 'app_evenements_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        if (!$this->isGranted('ROLE_PROF') && !$this->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException('Accès réservé aux professeurs ou administrateurs.');
-        }
-
         $evenement = new Evenements();
-        $form = $this->createForm(EvenementsType::class, $evenement);
+
+        // Création du formulaire avec l'option 'user_roles' pour gérer la checkbox
+        $form = $this->createForm(EvenementsType::class, $evenement, [
+            'user_roles' => $this->getUser() ? $this->getUser()->getRoles() : [],
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -62,6 +69,10 @@ final class EvenementsController extends AbstractController
     #[Route('/{id}', name: 'app_evenements_show', methods: ['GET'])]
     public function show(Evenements $evenement): Response
     {
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$evenement->isEstValide()) {
+            throw $this->createAccessDeniedException('Cet événement n’est pas encore actif.');
+        }
+
         return $this->render('evenements/show.html.twig', [
             'evenement' => $evenement,
         ]);
@@ -73,7 +84,7 @@ final class EvenementsController extends AbstractController
         $user = $this->getUser();
 
         // Vérifie si l'utilisateur est responsable via UserEvenement
-        $isResponsable = $evenement->getUserEvenements()->exists(function($key, $userEvenement) use ($user) {
+        $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $userEvenement) use ($user) {
             return $userEvenement->getRefUser() === $user && $userEvenement->isResponsable();
         });
 
@@ -81,7 +92,9 @@ final class EvenementsController extends AbstractController
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de modifier cet événement.');
         }
 
-        $form = $this->createForm(EvenementsType::class, $evenement);
+        $form = $this->createForm(EvenementsType::class, $evenement, [
+            'user_roles' => $this->getUser() ? $this->getUser()->getRoles() : [],
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -104,7 +117,7 @@ final class EvenementsController extends AbstractController
     {
         $user = $this->getUser();
 
-        $isResponsable = $evenement->getUserEvenements()->exists(function($key, $userEvenement) use ($user) {
+        $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $userEvenement) use ($user) {
             return $userEvenement->getRefUser() === $user && $userEvenement->isResponsable();
         });
 
@@ -112,7 +125,7 @@ final class EvenementsController extends AbstractController
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de supprimer cet événement.');
         }
 
-        if ($this->isCsrfTokenValid('delete'.$evenement->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $evenement->getId(), $request->request->get('_token'))) {
             $entityManager->remove($evenement);
             $entityManager->flush();
             $this->addFlash('success', 'Événement supprimé avec succès.');
@@ -121,4 +134,5 @@ final class EvenementsController extends AbstractController
         return $this->redirectToRoute('app_evenements_index', [], Response::HTTP_SEE_OTHER);
     }
 }
+
 
