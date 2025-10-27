@@ -1,89 +1,90 @@
 {% extends 'base.html.twig' %}
 
-
 {% block body %}
-{{ parent() }}
+    {{ parent() }}
 
     <!-- Hero Section -->
     <section id="hero" class="hero section">
-
         <div class="container" data-aos="fade-up" data-aos-delay="100">
-
             <div class="row align-items-center">
-            <p> NEWS ICI</p>
+                <p>NEWS ICI</p>
             </div>
-
         </div>
-
     </section><!-- /Hero Section -->
 
-    <!-- Home About Section -->
-    <section id="home-about" class="home-about section">
-
+    <!-- Carte des établissements (juste après le Hero) -->
+    <section id="map-section" class="home-about section">
         <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-            <p>UMAP ICI</p>
-
+            <h2>Carte des établissements</h2>
+            <div id="map"></div>
         </div>
+    </section><!-- /Map Section -->
 
-    </section><!-- /Home About Section -->
+    <!-- Styles pour la carte -->
+    <style>
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            margin: 30px 0;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: #f8f9fa;
+            color: #333;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .leaflet-popup-tip {
+            background: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            #map {
+                height: 300px;
+            }
+        }
+    </style>
 
     <!-- Featured Departments Section -->
     <section id="featured-departments" class="featured-departments section">
-
-        <!-- Section Title -->
         <div class="container section-title" data-aos="fade-up">
             <h2>Evenements à venir</h2>
-
-        </div><!-- End Section Title -->
-
-        <div class="container" data-aos="fade-up" data-aos-delay="100">
-
-            <div class="row g-5">
-
-
-                <!-- BOUCLE AVEC 3 DERNIERS EVENEMENTS -->
-                {% for evenement in evenements %}
-
-                <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
-                    <div class="department-highlight">
-                        <div class="highlight-icon">
-                            <i class="bi bi-0-circle"></i>
-                        </div>
-                        <h4>{{evenement.titre }}</h4>
-                        <p>{{ evenement.description }}</p>
-                        <ul class="highlight-list">
-                            <li>{{ evenement.nbPlacesDispo }} places disponibles</li>
-                        </ul>
-                        <a href="{{ path('app_evenements_show', {id: evenement.id}) }}" class="highlight-cta">En savoir plus</a>
-                    </div>
-                </div><!-- End Department Highlight -->
-
-                {% endfor %}
-
-
-            </div>
-
-
         </div>
 
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="row g-5">
+                {% for evenement in evenements %}
+                    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="department-highlight">
+                            <div class="highlight-icon">
+                                <i class="bi bi-0-circle"></i>
+                            </div>
+                            <h4>{{ evenement.titre }}</h4>
+                            <p>{{ evenement.description }}</p>
+                            <ul class="highlight-list">
+                                <li>{{ evenement.nbPlacesDispo }} places disponibles</li>
+                            </ul>
+                            <a href="{{ path('app_evenements_show', {id: evenement.id}) }}" class="highlight-cta">En savoir plus</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
     </section><!-- /Featured Departments Section -->
 
     <!-- Featured Services Section -->
     <section id="featured-services" class="featured-services section">
-
-        <!-- Section Title -->
         <div class="container section-title" data-aos="fade-up">
             <h2>Qui sommes nous ?</h2>
-        </div><!-- End Section Title -->
+        </div>
 
         <div class="container" data-aos="fade-up" data-aos-delay="100">
-
             <div class="row g-0">
-
                 <div class="col-lg-8" data-aos="fade-right" data-aos-delay="200">
                     <div class="featured-service-main">
-
                         <div class="service-details">
                             <h2>Comprehensive Healthcare Excellence</h2>
                             <p>Inauguré en 1995, l'hôpital privé HSP (Hôpital Sud Paris) est le fruit du rattachement de plusieurs établissements indépendants au pôle territorial Paris Sud du groupe GDH. Situé dans la commune de Marreuil sur Seine, à 25km de Paris, l'hôpital compte 90 praticiens et dispose de 289 lits.</p>
@@ -94,15 +95,13 @@
 
                 <div class="col-lg-4" data-aos="fade-left" data-aos-delay="300">
                     <div class="services-sidebar">
-
                         <div class="service-item" data-aos="fade-up" data-aos-delay="400">
                             <div class="service-icon-wrapper">
                                 <i class="bi bi-capsule"></i>
                             </div>
                             <div class="service-info">
-                                <h4>Une offre diversifié</h4>
-                                <p>l'établissement possède : un pôle de chirurgie; un pôle de médecine; un pôle de cancérologie; un pôle de maternité; un pôle d'imagerie médicale et un service d'urgences 24h/24 7j/7.
-                                </p>
+                                <h4>Une offre diversifiée</h4>
+                                <p>L'établissement possède : un pôle de chirurgie; un pôle de médecine; un pôle de cancérologie; un pôle de maternité; un pôle d'imagerie médicale et un service d'urgences 24h/24 7j/7.</p>
                                 <a href="#" class="service-link">Learn More</a>
                             </div>
                         </div>
@@ -113,37 +112,31 @@
                             </div>
                             <div class="service-info">
                                 <h4>Partout en France</h4>
-                                <p>Le groupe GDH est composé d’actuellement neuf Hôpitaux répartit un peu partout en France. </p>
+                                <p>Le groupe GDH est composé d’actuellement neuf Hôpitaux répartis un peu partout en France.</p>
                                 <a href="#" class="service-link">Learn More</a>
                             </div>
                         </div>
-
-
                     </div>
                 </div>
-
             </div>
-
         </div>
-
     </section><!-- /Featured Services Section -->
 
     <!-- Scroll Top -->
-    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+        <i class="bi bi-arrow-up-short"></i>
+    </a>
 
+    <!-- Footer -->
     <footer id="footer" class="footer-16 footer position-relative">
-
         <div class="container">
-
             <div class="footer-main" data-aos="fade-up" data-aos-delay="100">
                 <div class="row align-items-start">
-
                     <div class="col-lg-5">
                         <div class="brand-section">
-                            <a href={{ path('app_home')}} class="logo d-flex align-items-center mb-4>
+                            <a href="{{ path('app_home') }}" class="logo d-flex align-items-center mb-4">
                                 <span class="sitename">HSP</span>
                             </a>
-
                             <div class="contact-info mt-5">
                                 <div class="contact-item">
                                     <i class="bi bi-geo-alt"></i>
@@ -162,42 +155,79 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="footer-bottom">
             <div class="container">
                 <div class="bottom-content" data-aos="fade-up" data-aos-delay="300">
                     <div class="row align-items-center">
-
                         <div class="col-lg-6">
                             <div class="copyright">
                                 <p>© <span class="sitename">Clinic</span>. All rights reserved.</p>
                             </div>
                         </div>
-
                         <div class="col-lg-6">
                             <div class="legal-links">
                                 <a href="#">Privacy Policy</a>
                                 <a href="#">Terms of Service</a>
                                 <a href="#">Cookie Policy</a>
                                 <div class="credits">
-                                    <!-- All the links in the footer should remain intact. -->
-                                    <!-- You can delete the links only if you've purchased the pro version. -->
-                                    <!-- Licensing information: https://bootstrapmade.com/license/ -->
-                                    <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
                                     Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </div>
         </div>
-
     </footer>
 
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <script>
+        var etablissements = {{ etablissements|json_encode|raw }};
+
+        // Initialisation de la carte
+        var map = L.map('map').setView([46.5, 2.5], 6);
+
+        // Tiles style clair CARTO
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 19
+        }).addTo(map);
+
+        // Limites France pour empêcher de sortir
+        var franceBounds = [
+            [41.303, -5.142],
+            [51.124, 9.662]
+        ];
+        map.setMaxBounds(franceBounds);
+        map.setMinZoom(5);
+        map.on('drag', function() {
+            map.panInsideBounds(franceBounds, { animate: true });
+        });
+
+        // Marqueurs
+        etablissements.forEach(function(etab) {
+            if (etab.latitude && etab.longitude) {
+                L.marker([etab.latitude, etab.longitude])
+                    .addTo(map)
+                    .bindPopup(`
+                        <b>${etab.nbRue} ${etab.rue}</b><br>
+                        ${etab.cp} ${etab.ville}<br>
+                        Email : ${etab.mail}
+                        ${etab.tel ? "<br>Téléphone : " + etab.tel : ""}
+                    `);
+            }
+        });
+    </script>
 
 {% endblock %}
-
