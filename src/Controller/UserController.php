@@ -15,63 +15,52 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/user')]
 final class UserController extends AbstractController
 {
-    #[Route('/index',name: 'app_user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository,PaginatorInterface $paginator, Request $request): Response
+    #[Route('/index', name: 'app_user_index', methods: ['GET'])]
+    public function index(UserRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
     {
-        if ($this->isGranted('ROLE_ADMIN')) {
-
-            $status = $request->query->get('status', 'tous');
-
-            $search = $request->query->get('search', null);
-            //dump($status);
-            if ($status == "a_valider") {
-                $users = $userRepository->getFilteredNotValidatedUsersQuery($search);
-            }else {
-                $users = $userRepository->getFilteredUsersQuery($search);
-            }
-            $pagination = $paginator->paginate(
-                $users,
-                $request->query->getInt('page', 1),
-                6
-            );
-
-
-            return $this->render('user/index.html.twig', [
-                'status' => $status,
-                'pagination' => $pagination,
-                'search' => $search,
-            ]);
-        }else{
-            return $this->redirectToRoute("app_home");
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_home');
         }
+
+        $status = $request->query->get('status', 'tous');
+        $search = $request->query->get('search', null);
+
+        $users = $status === "a_valider"
+            ? $userRepository->getFilteredNotValidatedUsersQuery($search)
+            : $userRepository->getFilteredUsersQuery($search);
+
+        $pagination = $paginator->paginate($users, $request->query->getInt('page', 1), 6);
+
+        return $this->render('user/index.html.twig', [
+            'status' => $status,
+            'pagination' => $pagination,
+            'search' => $search,
+        ]);
     }
 
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isGranted('ROLE_ADMIN')) {
-
-            $user = new User();
-            $form = $this->createForm(UserType::class, $user);
-            $form->handleRequest($request);
-
-            if ($form->isSubmitted() && $form->isValid()) {
-
-                $user->setDateCreation(new \DateTime());
-
-                $entityManager->persist($user);
-                $entityManager->flush();
-
-                return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
-            }
-
-            return $this->render('user/new.html.twig', [
-                'user' => $user,
-                'form' => $form,
-            ]);
-        } else{
-            return $this->redirectToRoute("app_home");
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('app_home');
         }
+
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setDateCreation(new \DateTime());
+            $entityManager->persist($user);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('user/new.html.twig', [
+            'user' => $user,
+            'form' => $form,
+        ]);
     }
 
     #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
@@ -94,7 +83,6 @@ final class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }
 
@@ -107,7 +95,7 @@ final class UserController extends AbstractController
     #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
     public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
             $entityManager->remove($user);
             $entityManager->flush();
         }
@@ -116,7 +104,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/{id}/validate', name: 'app_user_validate', methods: ['POST'])]
-    public function validate(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    public function validate(User $user, EntityManagerInterface $entityManager): Response
     {
         $user->setEstValide(true);
         $entityManager->flush();
