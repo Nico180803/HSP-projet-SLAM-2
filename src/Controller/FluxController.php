@@ -17,8 +17,13 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/flux')]
 final class FluxController extends AbstractController
 {
-
-
+    #[Route(name: 'app_flux_index', methods: ['GET'])]
+    public function index(FluxRepository $fluxRepository): Response
+    {
+        return $this->render('flux/index.html.twig', [
+            'fluxes' => $fluxRepository->findAll(),
+        ]);
+    }
     #[Route('/new', name: 'app_flux_new', methods: ['POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
@@ -107,6 +112,34 @@ final class FluxController extends AbstractController
             'search' => $search,
         ]);
     }
+    #[Route('/{id}/edit', name: 'app_flux_edit', methods: ['GET', 'POST'])]
+    public function edit(Request $request, Flux $flux, EntityManagerInterface $entityManager): Response
+    {
 
+        $form = $this->createForm(FluxType::class, $flux);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_flux_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('flux/edit.html.twig', [
+            'flux' => $flux,
+            'form' => $form,
+        ]);
+    }
+
+    #[Route('/{id}', name: 'app_flux_delete', methods: ['POST'])]
+    public function delete(Request $request, Flux $flux, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('delete'.$flux->getId(), $request->getPayload()->getString('_token'))) {
+            $entityManager->remove($flux);
+            $entityManager->flush();
+        }
+
+        return $this->redirectToRoute('app_flux_index', [], Response::HTTP_SEE_OTHER);
+    }
 
 }
