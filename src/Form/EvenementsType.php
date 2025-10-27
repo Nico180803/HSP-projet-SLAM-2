@@ -8,11 +8,16 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
 class EvenementsType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $userRoles = $options['user_roles'] ?? []; // récupère les rôles passés en option
+
+        $isAdminOrProf = in_array('ROLE_ADMIN', $userRoles) || in_array('ROLE_PROF', $userRoles);
+
         $builder
             ->add('titre')
             ->add('description')
@@ -22,7 +27,10 @@ class EvenementsType extends AbstractType
             ->add('nb_rue')
             ->add('nb_places')
             ->add('nb_places_dispo')
-            ->add('est_valide')
+            ->add('est_valide', CheckboxType::class, [
+                'disabled' => !$isAdminOrProf, // désactive si pas admin ou prof
+                'required' => false,
+            ])
             ->add('refTypesEvenement', EntityType::class, [
                 'class' => TypesEvenements::class,
                 'choice_label' => 'id',
@@ -34,6 +42,8 @@ class EvenementsType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Evenements::class,
+            'user_roles' => [], // déclaration de l'option personnalisée
         ]);
     }
 }
+
