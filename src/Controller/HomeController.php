@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use App\Repository\EvenementsRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -20,9 +21,12 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(): Response
+    public function index(EvenementsRepository $evenementsRepository): Response
     {
-        return $this->render('home/index.html.twig');
+       $evenements = $evenementsRepository->getLastEvenements(3);
+
+        return $this->render('home/index.html.twig',[
+            'evenements' => $evenements]);
     }
 
     #[Route('/support', name: 'app_support')]
