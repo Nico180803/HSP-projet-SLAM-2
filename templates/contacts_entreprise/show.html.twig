@@ -3,14 +3,12 @@
 {% block title %}ContactsEntreprise{% endblock %}
 
 {% block body %}
+    {{ parent() }}
     <h1>ContactsEntreprise</h1>
 
     <table class="table">
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ contacts_entreprise.id }}</td>
-            </tr>
+
             <tr>
                 <th>Fonction</th>
                 <td>{{ contacts_entreprise.fonction }}</td>

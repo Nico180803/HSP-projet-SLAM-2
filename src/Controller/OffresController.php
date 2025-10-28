@@ -67,6 +67,31 @@ final class OffresController extends AbstractController
             'form' => $form,
         ]);
     }
+    #[Route('/newOffre', name: 'app_offres_newOffre', methods: ['GET', 'POST'])]
+    public function newOffre(Request $request, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->getUser() == null) {
+            return $this->redirectToRoute('app_home');
+        }
+        if (!in_array('ROLE_ENTREPRISE', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_home');
+        }
+        $offre = new Offres();
+        $form = $this->createForm(OffresType::class, $offre);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->persist($offre);
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('offres/new.html.twig', [
+            'offre' => $offre,
+            'form' => $form,
+        ]);
+    }
 
     #[Route('/{id}', name: 'app_offres_show', methods: ['GET'])]
     public function show(Offres $offre): Response

@@ -15,41 +15,12 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/evenements')]
 final class EvenementsController extends AbstractController
 {
-    #[Route('/evenement/{id}/join', name: 'app_evenement_join')]
-    public function join(Evenements $evenement, EntityManagerInterface $em, Security $security): Response
-    {
-        $user = $security->getUser();
-
-        if (!$user) {
-            $this->addFlash('error', 'Vous devez être connecté pour rejoindre un événement.');
-            return $this->redirectToRoute('app_login');
-        }
-
-        if ($evenement->getPlaces() > 0) {
-            if (!$evenement->getParticipants()->contains($user)) {
-                $evenement->addParticipant($user);
-                $evenement->setPlaces($evenement->getPlaces() - 1);
-                $em->persist($evenement);
-                $em->flush();
-
-                $this->addFlash('success', 'Vous avez rejoint l’événement !');
-            } else {
-                $this->addFlash('warning', 'Vous êtes déjà inscrit à cet événement.');
-            }
-        } else {
-            $this->addFlash('error', 'Plus de places disponibles.');
-        }
-
-        return $this->redirectToRoute('app_evenements_index');
-    }
-
-    #[Route(name: 'app_evenements_index', methods: ['GET'])]
+    #[Route('/', name: 'app_evenements_index', methods: ['GET'])]
     public function index(EvenementsRepository $evenementsRepository): Response
     {
         $user = $this->getUser();
 
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
-            // L'utilisateur voit les événements validés ou ceux dont il est responsable
             $evenements = $evenementsRepository->createQueryBuilder('e')
                 ->leftJoin('e.userEvenements', 'ue')
                 ->andWhere('e.est_valide = true OR (ue.refUser = :user AND ue.isResponsable = true)')
@@ -66,7 +37,7 @@ final class EvenementsController extends AbstractController
     }
 
     #[Route('/new', name: 'app_evenements_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $em): Response
     {
         $evenement = new Evenements();
         $user = $this->getUser();
@@ -74,38 +45,37 @@ final class EvenementsController extends AbstractController
         $form = $this->createForm(EvenementsType::class, $evenement, [
             'user_roles' => $user ? $user->getRoles() : [],
         ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Si l'utilisateur n'est pas admin/prof, l'événement reste non validé
             if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
                 $evenement->setEstValide(false);
             }
 
-            // Le créateur est toujours responsable
+            $em->persist($evenement);
+
+            // Créateur responsable
             $creator = new UserEvenement();
             $creator->setRefUser($user);
             $creator->setRefEvenement($evenement);
             $creator->setIsResponsable(true);
-            $entityManager->persist($creator);
+            $em->persist($creator);
 
-            // Autres responsables choisis
+            // Responsables supplémentaires
             $responsables = $form->get('responsables')->getData();
             foreach ($responsables as $responsable) {
                 if ($responsable !== $user) {
-                    $userEvenement = new UserEvenement();
-                    $userEvenement->setRefUser($responsable);
-                    $userEvenement->setRefEvenement($evenement);
-                    $userEvenement->setIsResponsable(true);
-                    $entityManager->persist($userEvenement);
+                    $ue = new UserEvenement();
+                    $ue->setRefUser($responsable);
+                    $ue->setRefEvenement($evenement);
+                    $ue->setIsResponsable(true);
+                    $em->persist($ue);
                 }
             }
 
-            $entityManager->persist($evenement);
-            $entityManager->flush();
-
+            $em->flush();
             $this->addFlash('success', 'Événement créé avec succès.');
-
             return $this->redirectToRoute('app_evenements_index');
         }
 
@@ -140,10 +110,9 @@ final class EvenementsController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_evenements_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Evenements $evenement, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Evenements $evenement, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-
         $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $ue) use ($user) {
             return $ue->getRefUser() === $user && $ue->isResponsable();
         });
@@ -160,24 +129,23 @@ final class EvenementsController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             foreach ($evenement->getUserEvenements() as $userEvenement) {
                 if ($userEvenement->isResponsable() && $userEvenement->getRefUser() !== $user) {
-                    $entityManager->remove($userEvenement);
+                    $em->remove($userEvenement);
                 }
             }
 
             $responsables = $form->get('responsables')->getData();
             foreach ($responsables as $responsable) {
                 if ($responsable !== $user) {
-                    $userEvenement = new UserEvenement();
-                    $userEvenement->setRefUser($responsable);
-                    $userEvenement->setRefEvenement($evenement);
-                    $userEvenement->setIsResponsable(true);
-                    $entityManager->persist($userEvenement);
+                    $ue = new UserEvenement();
+                    $ue->setRefUser($responsable);
+                    $ue->setRefEvenement($evenement);
+                    $ue->setIsResponsable(true);
+                    $em->persist($ue);
                 }
             }
 
-            $entityManager->flush();
+            $em->flush();
             $this->addFlash('success', 'Événement modifié avec succès.');
-
             return $this->redirectToRoute('app_evenements_index');
         }
 
@@ -189,8 +157,8 @@ final class EvenementsController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_evenements_delete', methods: ['POST'])]
-    public function delete(Request $request, Evenements $evenement, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: 'app_evenements_delete', methods: ['POST'])]
+    public function delete(Request $request, Evenements $evenement, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
         $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $ue) use ($user) {
@@ -202,16 +170,48 @@ final class EvenementsController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete' . $evenement->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($evenement);
-            $entityManager->flush();
+            $em->remove($evenement);
+            $em->flush();
             $this->addFlash('success', 'Événement supprimé avec succès.');
         }
 
         return $this->redirectToRoute('app_evenements_index');
     }
+
+    #[Route('/{id}/join', name: 'app_evenement_join')]
+    public function join(Evenements $evenement, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            $this->addFlash('error', 'Vous devez être connecté pour rejoindre un événement.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        if ($evenement->getNbPlacesDispo() <= 0) {
+            $this->addFlash('error', 'Plus de places disponibles.');
+            return $this->redirectToRoute('app_evenements_index');
+        }
+
+        $alreadyRegistered = $evenement->getUserEvenements()->exists(function($key, $ue) use ($user) {
+            return $ue->getRefUser() === $user;
+        });
+
+        if ($alreadyRegistered) {
+            $this->addFlash('warning', 'Vous êtes déjà inscrit à cet événement.');
+            return $this->redirectToRoute('app_evenements_index');
+        }
+
+        $userEvenement = new UserEvenement();
+        $userEvenement->setRefUser($user);
+        $userEvenement->setRefEvenement($evenement);
+        $userEvenement->setIsResponsable(false);
+        $em->persist($userEvenement);
+
+        $evenement->setNbPlacesDispo($evenement->getNbPlacesDispo() - 1);
+
+        $em->flush();
+        $this->addFlash('success', 'Vous êtes inscrit à l’événement !');
+
+        return $this->redirectToRoute('app_evenements_index');
+    }
 }
-
-
-
-
-
