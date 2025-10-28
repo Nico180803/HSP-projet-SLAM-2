@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New ContactsEntreprise{% endblock %}
+
+{% block body %}
+    <h1>Create new ContactsEntreprise</h1>
+
+    {{ include('contacts_entreprise/_form.html.twig') }}
+
+    <a href="{{ path('app_contacts_entreprise_index') }}">back to list</a>
+{% endblock %}

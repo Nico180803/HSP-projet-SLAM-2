@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit ContactsEntreprise{% endblock %}
+
+{% block body %}
+    <h1>Edit ContactsEntreprise</h1>
+
+    {{ include('contacts_entreprise/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_contacts_entreprise_index') }}">back to list</a>
+
+    {{ include('contacts_entreprise/_delete_form.html.twig') }}
+{% endblock %}

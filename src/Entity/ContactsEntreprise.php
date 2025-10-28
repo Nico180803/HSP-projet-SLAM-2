@@ -16,6 +16,8 @@ class ContactsEntreprise
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    private ?string $fonction = null;
+    #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
@@ -55,6 +57,18 @@ class ContactsEntreprise
     public function setNom(string $nom): static
     {
         $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getFonction(): ?string
+    {
+        return $this->fonction;
+    }
+
+    public function setFonction(string $fonction): static
+    {
+        $this->fonction = $fonction;
 
         return $this;
     }
