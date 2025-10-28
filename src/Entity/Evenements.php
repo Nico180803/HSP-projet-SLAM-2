@@ -64,6 +64,12 @@ class Evenements
     #[ORM\OneToMany(targetEntity: UserEvenement::class, mappedBy: 'refEvenement', orphanRemoval: true)]
     private Collection $userEvenements;
 
+    #[ORM\Column]
+    private ?\DateTime $date_debut = null;
+
+    #[ORM\Column]
+    private ?\DateTime $date_fin = null;
+
     public function __construct()
     {
         $this->inscrits = new ArrayCollection();
@@ -147,6 +153,30 @@ class Evenements
                 $userEvenement->setRefEvenement(null);
             }
         }
+        return $this;
+    }
+
+    public function getDateDebut(): ?\DateTime
+    {
+        return $this->date_debut;
+    }
+
+    public function setDateDebut(\DateTime $date_debut): static
+    {
+        $this->date_debut = $date_debut;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTime
+    {
+        return $this->date_fin;
+    }
+
+    public function setDateFin(\DateTime $date_fin): static
+    {
+        $this->date_fin = $date_fin;
+
         return $this;
     }
 }

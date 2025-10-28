@@ -10,6 +10,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
 class EvenementsType extends AbstractType
 {
@@ -43,6 +44,14 @@ class EvenementsType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'label' => 'Responsables supplémentaires',
+            ])
+            ->add('date_debut', DateTimeType::class, [
+                'widget' => 'single_text',
+                'label' => 'Date de début',
+            ])
+            ->add('date_fin', DateTimeType::class, [
+                'widget' => 'single_text',
+                'label' => 'Date de fin',
             ]);
     }
 

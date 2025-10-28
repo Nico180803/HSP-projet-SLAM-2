@@ -20,6 +20,7 @@ final class EvenementsController extends AbstractController
     {
         $user = $this->getUser();
 
+        // Les non-admins ne voient que les événements validés ou dont ils sont responsables
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
             $evenements = $evenementsRepository->createQueryBuilder('e')
                 ->leftJoin('e.userEvenements', 'ue')
@@ -49,13 +50,25 @@ final class EvenementsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifie la cohérence des dates
+            if ($evenement->getDateFin() < $evenement->getDateDebut()) {
+                $this->addFlash('error', 'La date de fin ne peut pas être avant la date de début.');
+                return $this->render('evenements/new.html.twig', [
+                    'evenement' => $evenement,
+                    'form' => $form->createView(),
+                    'title' => 'Créer un nouvel événement',
+                    'button_label' => 'Créer',
+                ]);
+            }
+
+            // Si l’utilisateur n’est pas admin/prof, l’événement doit être validé plus tard
             if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
                 $evenement->setEstValide(false);
             }
 
             $em->persist($evenement);
 
-            // Créateur responsable
+            // Créateur = responsable
             $creator = new UserEvenement();
             $creator->setRefUser($user);
             $creator->setRefEvenement($evenement);
@@ -91,10 +104,12 @@ final class EvenementsController extends AbstractController
     public function show(Evenements $evenement): Response
     {
         $user = $this->getUser();
+
         $isResponsable = $evenement->getUserEvenements()->exists(function($key, $ue) use ($user) {
             return $ue->getRefUser() === $user && $ue->isResponsable();
         });
 
+        // Restrictions d’accès
         if (
             !$this->isGranted('ROLE_ADMIN') &&
             !$this->isGranted('ROLE_PROF') &&
@@ -113,10 +128,12 @@ final class EvenementsController extends AbstractController
     public function edit(Request $request, Evenements $evenement, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
+
         $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $ue) use ($user) {
             return $ue->getRefUser() === $user && $ue->isResponsable();
         });
 
+        // Vérifie les droits
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$isResponsable) {
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de modifier cet événement.');
         }
@@ -127,12 +144,25 @@ final class EvenementsController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Vérifie les dates
+            if ($evenement->getDateFin() < $evenement->getDateDebut()) {
+                $this->addFlash('error', 'La date de fin ne peut pas être avant la date de début.');
+                return $this->render('evenements/edit.html.twig', [
+                    'evenement' => $evenement,
+                    'form' => $form->createView(),
+                    'title' => 'Modifier un événement',
+                    'button_label' => 'Enregistrer',
+                ]);
+            }
+
+            // Supprime les anciens responsables (sauf celui en cours)
             foreach ($evenement->getUserEvenements() as $userEvenement) {
                 if ($userEvenement->isResponsable() && $userEvenement->getRefUser() !== $user) {
                     $em->remove($userEvenement);
                 }
             }
 
+            // Ajoute les nouveaux responsables
             $responsables = $form->get('responsables')->getData();
             foreach ($responsables as $responsable) {
                 if ($responsable !== $user) {
@@ -161,6 +191,7 @@ final class EvenementsController extends AbstractController
     public function delete(Request $request, Evenements $evenement, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
+
         $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $ue) use ($user) {
             return $ue->getRefUser() === $user && $ue->isResponsable();
         });
@@ -182,16 +213,19 @@ final class EvenementsController extends AbstractController
     public function join(Evenements $evenement, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
+
         if (!$user) {
             $this->addFlash('error', 'Vous devez être connecté pour rejoindre un événement.');
             return $this->redirectToRoute('app_login');
         }
 
+        // Vérifie les places disponibles
         if ($evenement->getNbPlacesDispo() <= 0) {
             $this->addFlash('error', 'Plus de places disponibles.');
             return $this->redirectToRoute('app_evenements_index');
         }
 
+        // Vérifie si déjà inscrit
         $alreadyRegistered = $evenement->getUserEvenements()->exists(function($key, $ue) use ($user) {
             return $ue->getRefUser() === $user;
         });
@@ -201,12 +235,14 @@ final class EvenementsController extends AbstractController
             return $this->redirectToRoute('app_evenements_index');
         }
 
+        // Inscription
         $userEvenement = new UserEvenement();
         $userEvenement->setRefUser($user);
         $userEvenement->setRefEvenement($evenement);
         $userEvenement->setIsResponsable(false);
         $em->persist($userEvenement);
 
+        // Mise à jour des places
         $evenement->setNbPlacesDispo($evenement->getNbPlacesDispo() - 1);
 
         $em->flush();
