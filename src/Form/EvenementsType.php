@@ -54,5 +54,3 @@ class EvenementsType extends AbstractType
         ]);
     }
 }
-
-
