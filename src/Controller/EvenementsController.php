@@ -15,6 +15,34 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/evenements')]
 final class EvenementsController extends AbstractController
 {
+    #[Route('/evenement/{id}/join', name: 'app_evenement_join')]
+    public function join(Evenements $evenement, EntityManagerInterface $em, Security $security): Response
+    {
+        $user = $security->getUser();
+
+        if (!$user) {
+            $this->addFlash('error', 'Vous devez être connecté pour rejoindre un événement.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        if ($evenement->getPlaces() > 0) {
+            if (!$evenement->getParticipants()->contains($user)) {
+                $evenement->addParticipant($user);
+                $evenement->setPlaces($evenement->getPlaces() - 1);
+                $em->persist($evenement);
+                $em->flush();
+
+                $this->addFlash('success', 'Vous avez rejoint l’événement !');
+            } else {
+                $this->addFlash('warning', 'Vous êtes déjà inscrit à cet événement.');
+            }
+        } else {
+            $this->addFlash('error', 'Plus de places disponibles.');
+        }
+
+        return $this->redirectToRoute('app_evenements_index');
+    }
+
     #[Route(name: 'app_evenements_index', methods: ['GET'])]
     public function index(EvenementsRepository $evenementsRepository): Response
     {
