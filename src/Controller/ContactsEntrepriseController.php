@@ -17,8 +17,13 @@ final class ContactsEntrepriseController extends AbstractController
     #[Route(name: 'app_contacts_entreprise_index', methods: ['GET'])]
     public function index(ContactsEntrepriseRepository $contactsEntrepriseRepository): Response
     {
+        $user = $this->getUser();
+
+        $contactsEntreprises = $contactsEntrepriseRepository->findBy([
+            'refEntreprise' => $user,
+        ]);
         return $this->render('contacts_entreprise/index.html.twig', [
-            'contacts_entreprises' => $contactsEntrepriseRepository->findAll(),
+            'contacts_entreprises' => $contactsEntreprises,
         ]);
     }
 
