@@ -37,6 +37,9 @@ class Evenements
     #[ORM\Column]
     private ?int $nb_places = null;
 
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evenements')]
+    private Collection $participants;
+
     #[ORM\Column]
     private ?int $nb_places_dispo = null;
 
@@ -66,6 +69,7 @@ class Evenements
         $this->inscrits = new ArrayCollection();
         $this->responsables = new ArrayCollection();
         $this->userEvenements = new ArrayCollection();
+        $this->participants = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -94,6 +98,12 @@ class Evenements
     public function getNbPlacesDispo(): ?int { return $this->nb_places_dispo; }
     public function setNbPlacesDispo(int $nb_places_dispo): static { $this->nb_places_dispo = $nb_places_dispo; return $this; }
 
+    public function getParticipants(): Collection { return $this->participants; }
+    public function addParticipant(User $user): self {if (!$this->participants->contains($user)) {
+        $this->participants->add($user);}
+        return $this;
+    }
+    
     public function isEstValide(): ?bool { return $this->est_valide; }
     public function setEstValide(bool $est_valide): static { $this->est_valide = $est_valide; return $this; }
 
