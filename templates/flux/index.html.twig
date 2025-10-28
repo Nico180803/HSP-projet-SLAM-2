@@ -19,8 +19,9 @@
                 <td>{{ flux.id }}</td>
                 <td>{{ flux.titre }}</td>
                 <td>
-                    <a href="{{ path('app_flux_show', {'id': flux.id}) }}">show</a>
+
                     <a href="{{ path('app_flux_edit', {'id': flux.id}) }}">edit</a>
+
                 </td>
             </tr>
         {% else %}
