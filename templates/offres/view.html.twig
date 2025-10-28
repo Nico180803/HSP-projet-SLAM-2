@@ -41,8 +41,8 @@
                                     <span class="badge bg-primary-subtle text-dark">
                                              {{ offre.salaire }} euros
                                         </span>
-
-                                    <strong>Date de création:</strong> {{ offre.date_creation }} <strong>  Date de création:</strong> {{ offre.date_fermeture }}<br>
+                                    <br>
+                                    <strong>Date de création:</strong> {{ offre.dateCreation ? offre.dateCreation|date('Y-m-d') : '' }} <br><strong>  Date de fermeture:</strong> {{ offre.dateFermeture ? offre.dateFermeture|date('Y-m-d') : '' }}<br>
                                     <strong>Créé par:</strong> a faire
                                 </p>
 

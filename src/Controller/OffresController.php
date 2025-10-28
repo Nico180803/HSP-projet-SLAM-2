@@ -113,7 +113,7 @@ final class OffresController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        return $this->render('offres/show.html.twig', [
+        return $this->render('offres/showOffre.html.twig', [
             'offre' => $offre,
         ]);
     }
