@@ -19,6 +19,7 @@ class FluxType extends AbstractType
                     'Tout le monde' => 'ROLE_USER',
                     'Élève' => 'ROLE_ELEVE',
                     'Médecin' => 'ROLE_MEDECIN',
+                    'Entreprise' => 'ROLE_ENTREPRISE'
 
                 ],
                 'expanded' => true,
