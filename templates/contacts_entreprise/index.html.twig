@@ -3,12 +3,13 @@
 {% block title %}ContactsEntreprise index{% endblock %}
 
 {% block body %}
+    {{ parent() }}
     <h1>ContactsEntreprise index</h1>
 
     <table class="table">
         <thead>
             <tr>
-                <th>Id</th>
+                <th>Fonction</th>
                 <th>Nom</th>
                 <th>Prenom</th>
                 <th>Tel</th>
@@ -19,7 +20,7 @@
         <tbody>
         {% for contacts_entreprise in contacts_entreprises %}
             <tr>
-                <td>{{ contacts_entreprise.id }}</td>
+                <td>{{ contacts_entreprise.fonction }}</td>
                 <td>{{ contacts_entreprise.nom }}</td>
                 <td>{{ contacts_entreprise.prenom }}</td>
                 <td>{{ contacts_entreprise.tel }}</td>
