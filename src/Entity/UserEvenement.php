@@ -37,7 +37,6 @@ class UserEvenement
     public function setRefUser(?User $refUser): static
     {
         $this->refUser = $refUser;
-
         return $this;
     }
 
@@ -49,7 +48,6 @@ class UserEvenement
     public function setRefEvenement(?Evenements $refEvenement): static
     {
         $this->refEvenement = $refEvenement;
-
         return $this;
     }
 
@@ -61,7 +59,7 @@ class UserEvenement
     public function setIsResponsable(bool $isResponsable): static
     {
         $this->isResponsable = $isResponsable;
-
         return $this;
     }
 }
+

@@ -1,58 +1,68 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Evenements{% endblock %}
+{% block title %}Événement{% endblock %}
 
 {% block body %}
-    <h1>Evenements</h1>
+    <h1>Détails de l'événement</h1>
 
     <table class="table">
         <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ evenement.id }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ evenement.titre }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ evenement.description }}</td>
-            </tr>
-            <tr>
-                <th>Ville</th>
-                <td>{{ evenement.ville }}</td>
-            </tr>
-            <tr>
-                <th>Rue</th>
-                <td>{{ evenement.rue }}</td>
-            </tr>
-            <tr>
-                <th>Cp</th>
-                <td>{{ evenement.cp }}</td>
-            </tr>
-            <tr>
-                <th>Nb_rue</th>
-                <td>{{ evenement.nbRue }}</td>
-            </tr>
-            <tr>
-                <th>Nb_places</th>
-                <td>{{ evenement.nbPlaces }}</td>
-            </tr>
-            <tr>
-                <th>Nb_places_dispo</th>
-                <td>{{ evenement.nbPlacesDispo }}</td>
-            </tr>
-            <tr>
-                <th>Est_valide</th>
-                <td>{{ evenement.estValide ? 'Yes' : 'No' }}</td>
-            </tr>
+        <tr>
+            <th>Id</th>
+            <td>{{ evenement.id }}</td>
+        </tr>
+        <tr>
+            <th>Titre</th>
+            <td>{{ evenement.titre }}</td>
+        </tr>
+        <tr>
+            <th>Description</th>
+            <td>{{ evenement.description }}</td>
+        </tr>
+        <tr>
+            <th>Ville</th>
+            <td>{{ evenement.ville }}</td>
+        </tr>
+        <tr>
+            <th>Rue</th>
+            <td>{{ evenement.rue }}</td>
+        </tr>
+        <tr>
+            <th>Code Postal</th>
+            <td>{{ evenement.cp }}</td>
+        </tr>
+        <tr>
+            <th>Numéro rue</th>
+            <td>{{ evenement.nbRue }}</td>
+        </tr>
+        <tr>
+            <th>Nombre de places</th>
+            <td>{{ evenement.nbPlaces }}</td>
+        </tr>
+        <tr>
+            <th>Places disponibles</th>
+            <td>{{ evenement.nbPlacesDispo }}</td>
+        </tr>
+        <tr>
+            <th>Validé</th>
+            <td>{{ evenement.estValide ? 'Oui' : 'Non' }}</td>
+        </tr>
+        <tr>
+            <th>Responsables</th>
+            <td>
+                {% set responsables = evenement.userEvenements|filter(ue => ue.isResponsable) %}
+                {% for ue in responsables %}
+                    {{ ue.refUser.nom }} {{ ue.refUser.prenom }}{% if not loop.last %}, {% endif %}
+                {% else %}
+                    Aucun responsable
+                {% endfor %}
+            </td>
+        </tr>
         </tbody>
     </table>
 
-    <a href="{{ path('app_evenements_index') }}">back to list</a>
-
-    <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}">edit</a>
-
+    <a href="{{ path('app_evenements_index') }}" class="btn btn-secondary">Retour à la liste</a>
+    <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}" class="btn btn-primary">Modifier</a>
     {{ include('evenements/_delete_form.html.twig') }}
 {% endblock %}
+

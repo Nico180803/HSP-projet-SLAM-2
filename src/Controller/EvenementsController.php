@@ -18,9 +18,16 @@ final class EvenementsController extends AbstractController
     #[Route(name: 'app_evenements_index', methods: ['GET'])]
     public function index(EvenementsRepository $evenementsRepository): Response
     {
-        // 🔒 Les utilisateurs non-admin/prof ne voient que les événements validés
+        $user = $this->getUser();
+
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
-            $evenements = $evenementsRepository->findBy(['est_valide' => true]);
+            // L'utilisateur voit les événements validés ou ceux dont il est responsable
+            $evenements = $evenementsRepository->createQueryBuilder('e')
+                ->leftJoin('e.userEvenements', 'ue')
+                ->andWhere('e.est_valide = true OR (ue.refUser = :user AND ue.isResponsable = true)')
+                ->setParameter('user', $user)
+                ->getQuery()
+                ->getResult();
         } else {
             $evenements = $evenementsRepository->findAll();
         }
@@ -34,33 +41,44 @@ final class EvenementsController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $evenement = new Evenements();
+        $user = $this->getUser();
 
-        // Création du formulaire avec l'option 'user_roles'
         $form = $this->createForm(EvenementsType::class, $evenement, [
-            'user_roles' => $this->getUser() ? $this->getUser()->getRoles() : [],
+            'user_roles' => $user ? $user->getRoles() : [],
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Forcer est_valide à false si l'utilisateur n'est pas admin/prof
+            // Si l'utilisateur n'est pas admin/prof, l'événement reste non validé
             if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
                 $evenement->setEstValide(false);
             }
 
-            // Lier l'utilisateur courant comme responsable
-            $userEvenement = new UserEvenement();
-            $userEvenement->setRefUser($this->getUser());
-            $userEvenement->setRefEvenement($evenement);
-            $userEvenement->setIsResponsable(true);
-            $evenement->addUserEvenement($userEvenement);
+            // Le créateur est toujours responsable
+            $creator = new UserEvenement();
+            $creator->setRefUser($user);
+            $creator->setRefEvenement($evenement);
+            $creator->setIsResponsable(true);
+            $entityManager->persist($creator);
+
+            // Autres responsables choisis
+            $responsables = $form->get('responsables')->getData();
+            foreach ($responsables as $responsable) {
+                if ($responsable !== $user) {
+                    $userEvenement = new UserEvenement();
+                    $userEvenement->setRefUser($responsable);
+                    $userEvenement->setRefEvenement($evenement);
+                    $userEvenement->setIsResponsable(true);
+                    $entityManager->persist($userEvenement);
+                }
+            }
 
             $entityManager->persist($evenement);
-            $entityManager->persist($userEvenement);
             $entityManager->flush();
 
             $this->addFlash('success', 'Événement créé avec succès.');
 
-            return $this->redirectToRoute('app_evenements_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_evenements_index');
         }
 
         return $this->render('evenements/new.html.twig', [
@@ -74,7 +92,17 @@ final class EvenementsController extends AbstractController
     #[Route('/{id}', name: 'app_evenements_show', methods: ['GET'])]
     public function show(Evenements $evenement): Response
     {
-        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$evenement->isEstValide()) {
+        $user = $this->getUser();
+        $isResponsable = $evenement->getUserEvenements()->exists(function($key, $ue) use ($user) {
+            return $ue->getRefUser() === $user && $ue->isResponsable();
+        });
+
+        if (
+            !$this->isGranted('ROLE_ADMIN') &&
+            !$this->isGranted('ROLE_PROF') &&
+            !$evenement->isEstValide() &&
+            !$isResponsable
+        ) {
             throw $this->createAccessDeniedException('Cet événement n’est pas encore actif.');
         }
 
@@ -88,26 +116,41 @@ final class EvenementsController extends AbstractController
     {
         $user = $this->getUser();
 
-        // Vérifie si l'utilisateur est responsable via UserEvenement
-        $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $userEvenement) use ($user) {
-            return $userEvenement->getRefUser() === $user && $userEvenement->isResponsable();
+        $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $ue) use ($user) {
+            return $ue->getRefUser() === $user && $ue->isResponsable();
         });
 
-        // Admins et profs peuvent tout modifier
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$isResponsable) {
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de modifier cet événement.');
         }
 
         $form = $this->createForm(EvenementsType::class, $evenement, [
-            'user_roles' => $this->getUser() ? $this->getUser()->getRoles() : [],
+            'user_roles' => $user ? $user->getRoles() : [],
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            foreach ($evenement->getUserEvenements() as $userEvenement) {
+                if ($userEvenement->isResponsable() && $userEvenement->getRefUser() !== $user) {
+                    $entityManager->remove($userEvenement);
+                }
+            }
+
+            $responsables = $form->get('responsables')->getData();
+            foreach ($responsables as $responsable) {
+                if ($responsable !== $user) {
+                    $userEvenement = new UserEvenement();
+                    $userEvenement->setRefUser($responsable);
+                    $userEvenement->setRefEvenement($evenement);
+                    $userEvenement->setIsResponsable(true);
+                    $entityManager->persist($userEvenement);
+                }
+            }
+
             $entityManager->flush();
             $this->addFlash('success', 'Événement modifié avec succès.');
 
-            return $this->redirectToRoute('app_evenements_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_evenements_index');
         }
 
         return $this->render('evenements/edit.html.twig', [
@@ -122,12 +165,10 @@ final class EvenementsController extends AbstractController
     public function delete(Request $request, Evenements $evenement, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
-
-        $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $userEvenement) use ($user) {
-            return $userEvenement->getRefUser() === $user && $userEvenement->isResponsable();
+        $isResponsable = $evenement->getUserEvenements()->exists(function ($key, $ue) use ($user) {
+            return $ue->getRefUser() === $user && $ue->isResponsable();
         });
 
-        // Admins et profs peuvent tout supprimer
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$isResponsable) {
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de supprimer cet événement.');
         }
@@ -138,9 +179,11 @@ final class EvenementsController extends AbstractController
             $this->addFlash('success', 'Événement supprimé avec succès.');
         }
 
-        return $this->redirectToRoute('app_evenements_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_evenements_index');
     }
 }
+
+
 
 
 
