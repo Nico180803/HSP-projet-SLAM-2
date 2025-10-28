@@ -161,7 +161,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setRole(string $role): self
     {
-        $this->roles = [$role];
+        $this->roles = ["ROLE_USER",$role];
         return $this;
     }
 
