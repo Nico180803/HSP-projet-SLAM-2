@@ -3,6 +3,7 @@
 {% block title %}New Flux{% endblock %}
 
 {% block body %}
+    {{ parent() }}
     <h1>Create new Flux</h1>
 
     {{ include('flux/_form.html.twig') }}

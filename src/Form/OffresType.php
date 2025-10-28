@@ -21,7 +21,6 @@ class OffresType extends AbstractType
             ->add('salaire')
             ->add('date_creation')
             ->add('date_fermeture')
-            ->add('pj')
             ->add('contactsEntreprises', EntityType::class, [
                 'class' => ContactsEntreprise::class,
                 'choice_label' => 'id',

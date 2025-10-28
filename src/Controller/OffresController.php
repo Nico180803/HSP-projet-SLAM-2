@@ -6,6 +6,7 @@ use App\Entity\Offres;
 use App\Form\OffresType;
 use App\Repository\OffresRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,6 +26,19 @@ final class OffresController extends AbstractController
         }
         return $this->render('offres/index.html.twig', [
             'offres' => $offresRepository->findAll(),
+        ]);
+    }
+    #[Route('/view',name: 'app_offres_view', methods: ['GET','POST'])]
+    public function view(PaginatorInterface $paginator,Request $request,OffresRepository $offresRepository): Response
+    {
+        if ($this->getUser() == null) {
+            return $this->redirectToRoute('app_home');
+        }
+        $offres = $offresRepository->findAll();
+        $pagination = $paginator->paginate($offres, $request->query->getInt('page', 1), 6);
+        return $this->render('offres/view.html.twig', [
+            'offres' => $offres,
+            'pagination' => $pagination,
         ]);
     }
 
@@ -67,6 +81,17 @@ final class OffresController extends AbstractController
             'offre' => $offre,
         ]);
     }
+    #[Route('/{id}/showOffre', name: 'app_offres_showOffre', methods: ['GET'])]
+    public function showOffre(Offres $offre): Response
+    {
+        if ($this->getUser() == null) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        return $this->render('offres/show.html.twig', [
+            'offre' => $offre,
+        ]);
+    }
 
     #[Route('/{id}/edit', name: 'app_offres_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Offres $offre, EntityManagerInterface $entityManager): Response
@@ -77,6 +102,27 @@ final class OffresController extends AbstractController
         if (!in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
             return $this->redirectToRoute('app_home');
         }
+        $form = $this->createForm(OffresType::class, $offre);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager->flush();
+
+            return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        return $this->render('offres/edit.html.twig', [
+            'offre' => $offre,
+            'form' => $form,
+        ]);
+    }
+    #[Route('/{id}/editOffre', name: 'app_offres_editOffre', methods: ['GET', 'POST'])]
+    public function editOffre(Request $request, Offres $offre, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->getUser() == null) {
+            return $this->redirectToRoute('app_home');
+        }
+
         $form = $this->createForm(OffresType::class, $offre);
         $form->handleRequest($request);
 
