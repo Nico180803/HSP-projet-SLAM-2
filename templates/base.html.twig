@@ -132,7 +132,6 @@
                                             {% for roleFlux in forumU.role %}
                                                 {% if roleFlux in app.user.roles %}
                                                     <li><a href="{{ path('app_flux_show', { id: forumU.id }) }}">{{ forumU.titre }}</a></li>
-                                                    
                                                 {% endif %}
                                             {% endfor %}
                                         {% endif %}
