@@ -120,7 +120,7 @@ final class FluxController extends AbstractController
         if ($this->getUser() == null) {
             return $this->redirectToRoute('app_home');
         }
-        if (!in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+        if (count(array_intersect($flux->getRole(), $this->getUser()->getRoles())) == 0) {
             return $this->redirectToRoute('app_home');
         }
         $search = $request->query->get('search', null);

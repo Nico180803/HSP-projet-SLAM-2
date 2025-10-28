@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Offres index{% endblock %}
+
+{% block body %}
+    <h1>Offres index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Salaire</th>
+                <th>Date_creation</th>
+                <th>Date_fermeture</th>
+                <th>Pj</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for offre in offres %}
+            <tr>
+                <td>{{ offre.id }}</td>
+                <td>{{ offre.titre }}</td>
+                <td>{{ offre.description }}</td>
+                <td>{{ offre.salaire }}</td>
+                <td>{{ offre.dateCreation ? offre.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ offre.dateFermeture ? offre.dateFermeture|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ offre.pj }}</td>
+                <td>
+                    <a href="{{ path('app_offres_show', {'id': offre.id}) }}">show</a>
+                    <a href="{{ path('app_offres_edit', {'id': offre.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_offres_new') }}">Create new</a>
+    <br>
+    <a href="{{ path('app_types_offres_index') }}">Voir les types d'offres</a>
+{% endblock %}
