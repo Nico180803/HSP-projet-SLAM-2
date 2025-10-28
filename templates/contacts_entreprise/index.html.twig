@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ContactsEntreprise index{% endblock %}
+
+{% block body %}
+    <h1>ContactsEntreprise index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nom</th>
+                <th>Prenom</th>
+                <th>Tel</th>
+                <th>Mail</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for contacts_entreprise in contacts_entreprises %}
+            <tr>
+                <td>{{ contacts_entreprise.id }}</td>
+                <td>{{ contacts_entreprise.nom }}</td>
+                <td>{{ contacts_entreprise.prenom }}</td>
+                <td>{{ contacts_entreprise.tel }}</td>
+                <td>{{ contacts_entreprise.mail }}</td>
+                <td>
+                    <a href="{{ path('app_contacts_entreprise_show', {'id': contacts_entreprise.id}) }}">show</a>
+                    <a href="{{ path('app_contacts_entreprise_edit', {'id': contacts_entreprise.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_contacts_entreprise_new') }}">Create new</a>
+{% endblock %}
