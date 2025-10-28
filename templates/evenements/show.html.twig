@@ -50,12 +50,17 @@
         <tr>
             <th>Responsables</th>
             <td>
-                {% set responsables = evenement.userEvenements|filter(ue => ue.isResponsable) %}
-                {% for ue in responsables %}
-                    {{ ue.refUser.nom }} {{ ue.refUser.prenom }}{% if not loop.last %}, {% endif %}
+                {% set responsables = evenement.userEvenements
+                    |filter(ue => ue.isResponsable)
+                    |slice(0, 9999) %}
+
+                {% if responsables|length > 0 %}
+                    {% for ue in responsables %}
+                        {{ ue.refUser.nom }} {{ ue.refUser.prenom }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
                 {% else %}
                     Aucun responsable
-                {% endfor %}
+                {% endif %}
             </td>
         </tr>
         </tbody>
