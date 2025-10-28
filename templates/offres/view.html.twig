@@ -10,7 +10,7 @@
             <div class="text-center mt-4">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                 {% if 'ROLE_ENTREPRISE' in app.user.roles %}
-                <a href="{{ path('app_offres_newOffres') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="150">
+                <a href="{{ path('app_offres_newOffre') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="150">
                     <i class="bi bi-person-plus-fill me-2"></i>Créer une nouvel offre
                 </a>
                 {% endif %}
