@@ -59,12 +59,7 @@ final class FluxController extends AbstractController
     #[Route('/new', name: 'app_flux_new', methods: ['POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        if ($this->getUser() == null) {
-            return $this->redirectToRoute('app_home');
-        }
-        if ($this->getUser()->getRoles()) {
-            return $this->redirectToRoute('app_home');
-        }
+
         $titre = $request->request->get('titre');
         $message = $request->request->get('message');
         $refFluxId = $request->request->get('refFluxId');
@@ -120,9 +115,7 @@ final class FluxController extends AbstractController
         if ($this->getUser() == null) {
             return $this->redirectToRoute('app_home');
         }
-        if (count(array_intersect($flux->getRole(), $this->getUser()->getRoles())) == 0) {
-            return $this->redirectToRoute('app_home');
-        }
+
         $search = $request->query->get('search', null);
         $sujetRepository = $entityManager->getRepository(Sujets::class);
         $queryBuilder = $sujetRepository->createQueryBuilder('s')
