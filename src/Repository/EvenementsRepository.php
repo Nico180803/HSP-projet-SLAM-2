@@ -18,6 +18,7 @@ class EvenementsRepository extends ServiceEntityRepository
 
     public function getLastEvenements($number){
         $query = $this->createQueryBuilder('e');
+        $query->where('e.est_valide = true');
         $query->orderBy('e.id', 'DESC');
         $query->setMaxResults($number);
 
