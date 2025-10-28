@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     cv_directory: '%kernel.project_dir%/public/uploads/cv'
+
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -16,5 +17,8 @@ services:
     App\:
         resource: '../src/'
 
+    App\Service\ApiNewsService:
+        arguments:
+            $apiKey: '%env(API_KEY_NEWS)%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

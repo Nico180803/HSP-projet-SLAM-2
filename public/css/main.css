@@ -119,6 +119,42 @@ h6 {
   margin-bottom: 24px;
 }
 
+/* Fixe une hauteur identique pour toutes les images */
+.carousel-item {
+    height: 400px; /* ajuste selon ton design */
+}
+
+.carousel-img {
+    height: 100%;
+    width: 100%;
+    object-fit: cover; /* remplissage complet sans déformation */
+}
+
+/* Overlay semi-opaque pour rendre le texte lisible */
+.caption-overlay {
+    background: rgba(0, 0, 0, 0.6); /* fond plus sombre */
+    width: 100%;
+    bottom: 0;
+    position: absolute;
+}
+
+/* Texte */
+.caption-overlay h5 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.caption-overlay p {
+    font-size: 1rem;
+}
+
+/* Bouton */
+.caption-overlay .btn {
+    margin-top: 0.5rem;
+}
+
+
 .php-email-form .loading:before {
   content: "";
   display: inline-block;

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\EvenementsRepository;
 use App\Repository\EtablissementsRepository;
+use App\Service\ApiNewsService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,8 +20,10 @@ use Symfony\Component\Mime\Email;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(EvenementsRepository $evenementsRepository, EtablissementsRepository $etablissementsRepository): Response
+    public function index(ApiNewsService $newsService,EvenementsRepository $evenementsRepository, EtablissementsRepository $etablissementsRepository): Response
     {
+        $news = $newsService->getNews();
+
         // Récupérer les derniers événements
         $evenements = $evenementsRepository->getLastEvenements(3);
 
@@ -44,6 +47,7 @@ class HomeController extends AbstractController
         return $this->render('home/index.html.twig', [
             'evenements' => $evenements,
             'etablissements' => $data,
+            'news' => $news['articles'],
         ]);
     }
 

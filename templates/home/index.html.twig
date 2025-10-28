@@ -2,15 +2,59 @@
 
 {% block body %}
     {{ parent() }}
-
     <!-- Hero Section -->
-    <section id="hero" class="hero section">
+    <section id="hero" class="hero section py-5">
         <div class="container" data-aos="fade-up" data-aos-delay="100">
-            <div class="row align-items-center">
-                <p>NEWS ICI</p>
+            <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
+
+                <!-- Indicators -->
+                <div class="carousel-indicators">
+                    {% for article in news %}
+                        <button type="button" data-bs-target="#newsCarousel" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active"{% endif %} aria-current="true" aria-label="Slide {{ loop.index }}"></button>
+                    {% endfor %}
+                </div>
+
+                <!-- Slides -->
+                <div class="carousel-inner rounded shadow">
+                    {% for article in news %}
+                        <div class="carousel-item {% if loop.first %}active{% endif %}">
+                            <div class="row align-items-center">
+                                {% if article.urlToImage %}
+                                    <div class="col-md-6">
+                                        <img src="{{ article.urlToImage }}" class="d-block w-100 carousel-img" alt="{{ article.title }}">
+                                    </div>
+                                {% endif %}
+                                <div class="col-md-6">
+                                    <div class="p-4">
+                                        <h5 class="fw-bold">{{ article.title|default('Sans titre') }}</h5>
+                                        <p>{{ article.description|default('') }}</p>
+                                        {% if article.url %}
+                                            <a href="{{ article.url }}" class="btn btn-primary mt-2" target="_blank">Lire la suite</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Controls -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Précédent</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Suivant</span>
+                </button>
+
             </div>
         </div>
-    </section><!-- /Hero Section -->
+    </section>
+
+
+
+    <!-- /Hero Section -->
 
     <!-- Carte des établissements (juste après le Hero) -->
     <section id="map-section" class="home-about section">
