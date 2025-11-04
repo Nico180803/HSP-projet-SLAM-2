@@ -119,6 +119,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     private $evenementsResponsable;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $reset_token = null;
+
     public function __construct()
     {
         $this->evenementsResponsable = new ArrayCollection();
@@ -583,5 +586,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __toString(): string
     {
         return $this->nom;// TODO: Implement __toString() method.
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->reset_token;
+    }
+
+    public function setResetToken(?string $reset_token): static
+    {
+        $this->reset_token = $reset_token;
+
+        return $this;
     }
 }
