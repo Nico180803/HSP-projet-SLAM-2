@@ -71,6 +71,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $query;
     }
 
+    public function getLastUser($number){
+        $query = $this->createQueryBuilder('e');
+        $query->orderBy('e.id', 'DESC');
+        $query->setMaxResults($number);
+
+        return $query->getQuery()->getResult();
+    }
+
 
 
     //    /**

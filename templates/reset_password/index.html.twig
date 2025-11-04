@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mot de passe oublié{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+    <div class="container py-5 d-flex flex-column align-items-center justify-content-center min-vh-100">
+
+        <div class="w-100" style="max-width:480px;">
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+
+                    {# HEADER #}
+                    <div class="text-center mb-4">
+                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center"
+                             style="width:56px;height:56px;">
+                            <i class="bi bi-lock-fill fs-4"></i>
+                        </div>
+
+                        <h1 class="h4 fw-bold mt-3 mb-1">Mot de passe oublié ?</h1>
+                        <p class="text-muted small mb-0">
+                            Pas de panique. Entre ton adresse e-mail et on t’enverra un lien pour réinitialiser ton mot de passe.
+                        </p>
+                    </div>
+
+                    {# FLASH MESSAGES (succès / erreur) #}
+                    {% for message in app.flashes('success') %}
+                        <div class="alert alert-success small">{{ message }}</div>
+                    {% endfor %}
+
+                    {% for message in app.flashes('error') %}
+                        <div class="alert alert-danger small">{{ message }}</div>
+                    {% endfor %}
+
+                    {# FORMULAIRE #}
+                    {{ form_start(demande, {'attr': {'novalidate': 'novalidate'}}) }}
+                        <div class="mb-3">
+
+                            <div class="mb-3">
+                                {{ form_label(demande.email, 'Adresse e-mail', {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                {{ form_widget(demande.email, {'attr': {'class': 'form-control', 'placeholder': 'exemple@domaine.fr'}}) }}
+                                {{ form_errors(demande.email) }}
+                            </div>
+                        </div>
+
+                        {{ form_widget(demande.submit, {'attr': {'class': 'btn btn-primary w-100'}}) }}
+
+                    {{ form_end(demande) }}
+
+                    <div class="text-center my-4 text-muted small position-relative">
+                        <hr class="opacity-25 m-0">
+                        <span class="bg-white px-2 position-absolute start-50 translate-middle"
+                              style="top:0;">
+                        ou
+                    </span>
+                    </div>
+
+                    {# RETOUR LOGIN #}
+                    <div class="text-center">
+                        <a href="{{ path('app_login') }}" class="text-decoration-none small">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Revenir à la connexion
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+            <p class="text-center text-muted small mt-3 mb-0">
+                Tu n’as plus accès à ton e-mail ? Contacte un administrateur.
+            </p>
+
+        </div>
+
+    </div>
+{% endblock %}
