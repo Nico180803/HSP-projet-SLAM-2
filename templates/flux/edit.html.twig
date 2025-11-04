@@ -1,14 +1,31 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Flux{% endblock %}
+{% block title %}Modifier un flux{% endblock %}
 
 {% block body %}
     {{ parent() }}
-    <h1>Edit Flux</h1>
 
-    {{ include('flux/_form.html.twig', {'button_label': 'Update'}) }}
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Modifier le flux</h2>
+                    <p class="text-muted mb-0">Mettez à jour les informations de votre flux</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('app_flux_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                    </a>
+                    {{ include('flux/_delete_form.html.twig') }}
+                </div>
+            </div>
 
-    <a href="{{ path('app_flux_index') }}">back to list</a>
-
-    {{ include('flux/_delete_form.html.twig') }}
+            <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                <div class="card-body p-4">
+                    {{ include('flux/_form.html.twig', { button_label: 'Mettre à jour' }) }}
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
+
