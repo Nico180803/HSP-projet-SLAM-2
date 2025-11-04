@@ -38,7 +38,7 @@
                                 <tr>
                                     <th style="width: 90px;">ID</th>
                                     <th>Titre</th>
-                                    <th style="width: 140px;" class="text-end">Actions</th>
+                                    <th style="width: 220px;" class="text-end">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -51,9 +51,21 @@
                                         </td>
                                         <td class="fw-semibold">{{ flux.titre }}</td>
                                         <td class="text-end">
-                                            <a href="{{ path('app_flux_edit', {'id': flux.id}) }}" class="btn btn-sm btn-outline-primary">
-                                                <i class="bi bi-pencil-square me-1"></i> Modifier
-                                            </a>
+                                            <div class="d-inline-flex align-items-center gap-2">
+                                                <a href="{{ path('app_flux_edit', {'id': flux.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil-square me-1"></i> Modifier
+                                                </a>
+
+                                                <form method="post"
+                                                      action="{{ path('app_flux_delete', {'id': flux.id}) }}"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Supprimer ce flux ? Cette action est irréversible.');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ flux.id) }}">
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash3 me-1"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 {% endfor %}
