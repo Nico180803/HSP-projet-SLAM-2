@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sujets{% endblock %}
+
+{% block body %}
+    <h1>Sujets</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ sujet.id }}</td>
+            </tr>
+            <tr>
+                <th>Message</th>
+                <td>{{ sujet.message }}</td>
+            </tr>
+            <tr>
+                <th>Pj</th>
+                <td>{{ sujet.pj }}</td>
+            </tr>
+            <tr>
+                <th>Date_creation</th>
+                <td>{{ sujet.dateCreation ? sujet.dateCreation|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+            <tr>
+                <th>Titre</th>
+                <td>{{ sujet.titre }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_sujets_index') }}">back to list</a>
+
+    <a href="{{ path('app_sujets_edit', {'id': sujet.id}) }}">edit</a>
+
+    {{ include('sujets/_delete_form.html.twig') }}
+{% endblock %}

@@ -25,6 +25,15 @@ class EvenementsRepository extends ServiceEntityRepository
         return $query->getQuery()->getResult();
     }
 
+    public function getNumberOfEvenements(){
+        $query = $this->createQueryBuilder('e');
+        $query->select('count(e.id)');
+        $query->where('e.est_valide = true');
+
+        $event = $query->getQuery()->getSingleScalarResult();
+        return $event;
+    }
+
     //    /**
     //     * @return Evenements[] Returns an array of Evenements objects
     //     */

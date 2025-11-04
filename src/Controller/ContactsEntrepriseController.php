@@ -45,7 +45,7 @@ final class ContactsEntrepriseController extends AbstractController
         $contactsEntreprise = new ContactsEntreprise();
         $form = $this->createForm(ContactsEntrepriseType::class, $contactsEntreprise);
         $form->handleRequest($request);
-        $contactsEntreprise->setRefEntreprise($this->getUser()->getId());
+        $contactsEntreprise->setRefEntreprise($this->getUser());
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($contactsEntreprise);

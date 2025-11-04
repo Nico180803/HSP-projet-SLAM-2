@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Sujets{% endblock %}
+
+{% block body %}
+    <h1>Edit Sujets</h1>
+
+    {{ include('sujets/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_sujets_index') }}">back to list</a>
+
+    {{ include('sujets/_delete_form.html.twig') }}
+{% endblock %}

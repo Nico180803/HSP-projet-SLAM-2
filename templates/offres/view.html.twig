@@ -34,6 +34,13 @@
                                 <h5 class="card-title">
                                     {#                                    <i class="bi bi-building">#}
                                     <i class="bi bi-person-circle me-2"></i>{{ offre.titre }}
+                                    <span class="badge bg-primary-subtle text-dark">
+                                        {% if offre.refUser %}
+                                             Nombre de candidature: {{ offre.refUser|length }}
+                                        {% else %}
+                                            Nombre de candidature: 0
+                                        {% endif %}
+                                        </span>
                                 </h5>
                                 <p class="card-text mb-2">
                                     <strong>Salaire:</strong>
@@ -42,7 +49,8 @@
                                              {{ offre.salaire }} euros
                                         </span>
                                     <br>
-                                    <strong>Date de création:</strong> {{ offre.dateCreation ? offre.dateCreation|date('Y-m-d') : '' }} <br><strong>  Date de fermeture:</strong> {{ offre.dateFermeture ? offre.dateFermeture|date('Y-m-d') : '' }}<br>
+                                    <strong>Date de création:</strong> {{ offre.dateCreation|date('d/m/Y') }} <br>
+                                    <strong>  Date de création:</strong> {{ offre.dateFermeture|date('d/m/Y') }}<br>
                                     <strong>Créé par:</strong> a faire
                                 </p>
 

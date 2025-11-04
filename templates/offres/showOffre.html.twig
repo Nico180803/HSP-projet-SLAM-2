@@ -26,8 +26,8 @@
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <p><strong>Salaire:</strong> {{ offre.salaire }}</p>
-                                        <p><strong>Date de création:</strong> {{ offre.dateCreation ? offre.dateCreation|date('Y-m-d') : '' }}</p>
-                                        <p><strong>Date de fermeture:</strong> {{ offre.dateFermeture ? offre.dateFermeture|date('Y-m-d') : '' }}</p>
+                                        <p><strong>Date de création:</strong> {{ offre.dateCreation|date('d/m/Y') }}</p>
+                                        <p><strong>Date de fermeture:</strong> {{ offre.dateFermeture|date('d/m/Y') }}</p>
                                     </div>
                                     <div class="col-md-6">
                                         <p><strong>Créateur:</strong> test</p>
@@ -55,7 +55,7 @@
 
                                 {% if 'ROLE_ENTREPRISE' in app.user.roles %} {# ajouter une condition seulement l'entreprise qui a creer peut modifier #}
                                 <div class="d-flex gap-2">
-                                    <a href="{{ path('app_offres_edit', {'id': user.id}) }}" class="btn btn-outline-primary">
+                                    <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-outline-primary">
                                         <i class="bi bi-pencil"></i> Modifier
                                     </a>
                                 </div>

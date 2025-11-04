@@ -34,11 +34,19 @@ final class OffresController extends AbstractController
         if ($this->getUser() == null) {
             return $this->redirectToRoute('app_home');
         }
-        $offres = $offresRepository->findAll();
+        if (in_array('ROLE_ENTREPRISE', $this->getUser()->getRoles())) {
+            $offres = $offresRepository->findBy([
+                    'refCreateur' => $this->getUser()
+                ]);
+        }else{
+            $offres = $offresRepository->findAll();
+        }
+
         $pagination = $paginator->paginate($offres, $request->query->getInt('page', 1), 6);
         return $this->render('offres/view.html.twig', [
             'offres' => $offres,
             'pagination' => $pagination,
+
         ]);
     }
 
