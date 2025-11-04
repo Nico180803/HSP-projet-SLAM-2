@@ -94,6 +94,11 @@
                                     <button @click="toggleReplies('{{ idSujet }}')" class="btn btn-outline btn-small">
                                         [[ repliesVisible['{{ idSujet }}'] ? 'Cacher les réponses' : 'Voir les réponses ({{ sujet.commentaires|length }})' ]]
                                     </button>
+                                    {% if "ROLE_ADMIN" in app.user.roles %}
+                                        {{ include('sujets/_delete_form.html.twig') }}
+                                    {% elseif sujet.refUser == app.user %}
+                                        {{ include('sujets/_delete_form.html.twig') }}
+                                    {% endif %}
                                 </div>
 
                                 <!-- Section réponses -->
@@ -101,11 +106,23 @@
                                     <h4 class="font-medium text-gray-800 mb-4">Réponses ({{ sujet.commentaires|length }})</h4>
                                     {% for commentaire in sujet.commentaires %}
                                         <div class="reply-card mb-4 bg-white border border-gray-200 rounded-lg p-4">
-                                            <div class="reply-meta text-xs text-gray-600 mb-2">
-                                                <strong>par {{ commentaire.refUser }}</strong>
-                                            </div>
-                                            <div class="reply-content text-gray-700">
-                                                {{ commentaire.reponse }}
+                                            <div class="flex justify-between items-start">
+                                                <div>
+                                                    <div class="reply-meta text-xs text-gray-600 mb-2">
+                                                        <strong>par {{ commentaire.refUser }}</strong>
+                                                    </div>
+                                                    <div class="reply-content text-gray-700">
+                                                        {{ commentaire.reponse }}
+                                                    </div>
+                                                </div>
+
+                                                <div class="ml-4">
+                                                    {% if "ROLE_ADMIN" in app.user.roles %}
+                                                        {{ include('commentaires/_delete_form.html.twig') }}
+                                                    {% elseif commentaire.refUser == app.user %}
+                                                        {{ include('commentaires/_delete_form.html.twig') }}
+                                                    {% endif %}
+                                                </div>
                                             </div>
                                         </div>
                                     {% endfor %}
