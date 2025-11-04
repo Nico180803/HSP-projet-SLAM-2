@@ -46,13 +46,12 @@
 
                         <div class="d-flex align-items-baseline">
                         <span class="display-6 fw-bold me-2">
-                            {{ upcomingEventsCount ?? 5 }}
+                            {{ upcomingEvent }}
                         </span>
                             <span class="text-muted">planifiés</span>
                         </div>
 
                         <div class="mt-3 d-flex justify-content-between small text-muted">
-                            <span>Cette semaine</span>
                             <a href="{{ path('app_evenements_index') }}" class="text-decoration-none">Voir tout →</a>
                         </div>
                     </div>
@@ -179,33 +178,30 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for event in upcomingEvents ?? [
-                                {title:'Atelier sécurité', date:'2025-11-03 14:00', place:'Salle B12', id:1},
-                                {title:'Réunion parents/profs', date:'2025-11-05 18:30', place:'Amphi A', id:2},
-                                {title:'Forum des métiers', date:'2025-11-10 09:00', place:'Hall principal', id:3}
-                            ] %}
+                            {% for evenement in evenements %}
                                 <tr>
                                     <td class="fw-semibold">
-                                        {{ event.title }}
+                                        {{ evenement.titre }}
                                     </td>
                                     <td>
                                     <span class="badge bg-light text-dark border">
-                                        {{ event.date }}
+                                        {{ evenement.dateDebut|date('d/m/Y') }} - {{ evenement.dateFin|date('d/m/Y') }}
                                     </span>
                                     </td>
                                     <td class="text-muted small">
-                                        {{ event.place }}
+                                        {{ evenement.nbPlacesDispo }}
                                     </td>
                                     <td class="text-end">
-                                        <a href="{{ path('app_evenements_show', {id: event.id}) }}"
+                                        <a href="{{ path('app_evenements_show', {id: evenement.id}) }}"
                                            class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a href="{{ path('app_evenements_delete', {id: event.id}) }}"
+                                        <a href="#"
                                            class="btn btn-sm btn-outline-danger"
-                                           onclick="return confirm('Supprimer cet évènement ?');">
+                                           onclick="document.getElementById('event_{{ evenement.id }}_delete').submit()">
                                             <i class="bi bi-trash"></i>
                                         </a>
+                                        {{ include("evenements/_delete_form.html.twig") }}
                                     </td>
                                 </tr>
                             {% else %}

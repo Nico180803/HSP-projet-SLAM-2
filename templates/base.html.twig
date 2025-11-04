@@ -139,10 +139,13 @@
                                 </ul>
                             </li>
                             <li><a href="{{ path('app_evenements_index') }}">Evenements</a></li>
-                            <li><a href="{{ path('app_offres_view') }}">Offres</a></li>
+                            {% if 'ROLE_MEDECIN' in app.user.roles %}
+                            {% else %}
+                                <li><a href="{{ path('app_offres_view') }}">Offres</a></li>
+                            {% endif %}
                             {% if 'ROLE_ENTREPRISE' in app.user.roles %}
-                            <li><a href="{{ path('app_contacts_entreprise_index') }}">Contacts entreprise</a></li>
-                                {% endif %}
+                                <li><a href="{{ path('app_contacts_entreprise_index') }}">Contacts entreprise</a></li>
+                            {% endif %}
                         {% endif %}
                         {# faire si connecter = acces profil #}
                         <li class="dropdown"><a href="#"><span>Compte</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
