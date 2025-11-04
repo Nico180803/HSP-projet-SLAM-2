@@ -1,42 +1,86 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}ContactsEntreprise index{% endblock %}
+{% block title %}Contacts – Entreprise{% endblock %}
 
 {% block body %}
     {{ parent() }}
-    <h1>ContactsEntreprise index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Fonction</th>
-                <th>Nom</th>
-                <th>Prenom</th>
-                <th>Tel</th>
-                <th>Mail</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for contacts_entreprise in contacts_entreprises %}
-            <tr>
-                <td>{{ contacts_entreprise.fonction }}</td>
-                <td>{{ contacts_entreprise.nom }}</td>
-                <td>{{ contacts_entreprise.prenom }}</td>
-                <td>{{ contacts_entreprise.tel }}</td>
-                <td>{{ contacts_entreprise.mail }}</td>
-                <td>
-                    <a href="{{ path('app_contacts_entreprise_show', {'id': contacts_entreprise.id}) }}">show</a>
-                    <a href="{{ path('app_contacts_entreprise_edit', {'id': contacts_entreprise.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-    <a href="{{ path('app_contacts_entreprise_new') }}">Create new</a>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Contacts d’entreprise</h2>
+                    <p class="text-muted mb-0">Gérez les interlocuteurs de vos établissements</p>
+                </div>
+                <a href="{{ path('app_contacts_entreprise_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Nouveau contact
+                </a>
+            </div>
+
+            {% if contacts_entreprises is empty %}
+                <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card-body p-5 text-center">
+                        <i class="bi bi-person-rolodex display-5 d-block mb-3"></i>
+                        <h5 class="fw-semibold mb-2">Aucun contact enregistré</h5>
+                        <p class="text-muted mb-0">Ajoutez votre premier contact pour commencer.</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Fonction</th>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Téléphone</th>
+                                    <th>E-mail</th>
+                                    <th class="text-end" style="width: 260px;">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for contacts_entreprise in contacts_entreprises %}
+                                    <tr>
+                                        <td>{{ contacts_entreprise.fonction }}</td>
+                                        <td class="fw-semibold">{{ contacts_entreprise.nom }}</td>
+                                        <td>{{ contacts_entreprise.prenom }}</td>
+                                        <td>{{ contacts_entreprise.tel }}</td>
+                                        <td>
+                                            {% if contacts_entreprise.mail %}
+                                                <a href="mailto:{{ contacts_entreprise.mail }}">{{ contacts_entreprise.mail }}</a>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex align-items-center gap-2">
+                                                <a href="{{ path('app_contacts_entreprise_show', {'id': contacts_entreprise.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="bi bi-eye me-1"></i> Voir
+                                                </a>
+                                                <a href="{{ path('app_contacts_entreprise_edit', {'id': contacts_entreprise.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil-square me-1"></i> Modifier
+                                                </a>
+                                                <form method="post"
+                                                      action="{{ path('app_contacts_entreprise_delete', {'id': contacts_entreprise.id}) }}"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Supprimer ce contact ? Cette action est irréversible.');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ contacts_entreprise.id) }}">
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash3 me-1"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
 {% endblock %}

@@ -1,26 +1,54 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TypesOffres{% endblock %}
+{% block title %}Type d'offre{% endblock %}
 
 {% block body %}
-    <h1>TypesOffres</h1>
+    {{ parent() }}
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ types_offre.id }}</td>
-            </tr>
-            <tr>
-                <th>Libelle</th>
-                <td>{{ types_offre.libelle }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-    <a href="{{ path('app_types_offres_index') }}">back to list</a>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Détails du type</h2>
+                    <p class="text-muted mb-0">Informations sur le type d’offre</p>
+                </div>
+                <div class="d-inline-flex align-items-center gap-2">
+                    <a href="{{ path('app_types_offres_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                    </a>
+                    <a href="{{ path('app_types_offres_edit', {'id': types_offre.id}) }}" class="btn btn-primary">
+                        <i class="bi bi-pencil-square me-1"></i> Modifier
+                    </a>
+                    {{ include('types_offres/_delete_form.html.twig', { types_offre: types_offre }) }}
+                </div>
+            </div>
 
-    <a href="{{ path('app_types_offres_edit', {'id': types_offre.id}) }}">edit</a>
+            <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                <div class="card-body p-4">
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item px-0 d-flex justify-content-between">
+                                    <span class="text-muted">ID</span>
+                                    <span class="fw-semibold">#{{ types_offre.id }}</span>
+                                </li>
+                                <li class="list-group-item px-0 d-flex justify-content-between">
+                                    <span class="text-muted">Libellé</span>
+                                    <span class="fw-semibold">{{ types_offre.libelle }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="alert alert-info border-0">
+                                <i class="bi bi-lightbulb me-2"></i>
+                                Conseil : utilisez des libellés uniformes pour faciliter la recherche.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    {{ include('types_offres/_delete_form.html.twig') }}
+        </div>
+    </section>
 {% endblock %}

@@ -1,37 +1,86 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}TypesOffres index{% endblock %}
+{% block title %}Types d'offres – Liste{% endblock %}
 
 {% block body %}
-    <h1>TypesOffres index</h1>
+    {{ parent() }}
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Libelle</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for types_offre in types_offres %}
-            <tr>
-                <td>{{ types_offre.id }}</td>
-                <td>{{ types_offre.libelle }}</td>
-                <td>
-                    <a href="{{ path('app_types_offres_show', {'id': types_offre.id}) }}">show</a>
-                    <a href="{{ path('app_types_offres_edit', {'id': types_offre.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Types d'offres</h2>
+                    <p class="text-muted mb-0">Gérez les familles d’offres</p>
+                </div>
+                <div class="d-inline-flex gap-2">
+                    <a href="{{ path('app_offres_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Retour
+                    </a>
+                    <a href="{{ path('app_types_offres_new') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Nouveau type
+                    </a>
+                </div>
+            </div>
 
-    <a href="{{ path('app_types_offres_new') }}">Create new</a>
-    <br>
-    <a href="{{ path('app_offres_index') }}">Retour</a>
+            {% if types_offres is empty %}
+                <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card-body p-5 text-center">
+                        <i class="bi bi-tags display-5 d-block mb-3"></i>
+                        <h5 class="fw-semibold mb-2">Aucun type d’offre</h5>
+                        <p class="text-muted">Créez votre premier type pour organiser vos offres.</p>
+                        <a href="{{ path('app_types_offres_new') }}" class="btn btn-primary mt-2">
+                            <i class="bi bi-plus-circle me-1"></i> Créer un type
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th style="width: 90px;">ID</th>
+                                    <th>Libellé</th>
+                                    <th class="text-end" style="width: 260px;">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for types_offre in types_offres %}
+                                    <tr>
+                                        <td>
+                      <span class="badge bg-secondary-subtle text-secondary-emphasis border">
+                        #{{ types_offre.id }}
+                      </span>
+                                        </td>
+                                        <td class="fw-semibold">{{ types_offre.libelle }}</td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex align-items-center gap-2">
+                                                <a href="{{ path('app_types_offres_show', {'id': types_offre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="bi bi-eye me-1"></i> Voir
+                                                </a>
+                                                <a href="{{ path('app_types_offres_edit', {'id': types_offre.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil-square me-1"></i> Modifier
+                                                </a>
+                                                <form method="post"
+                                                      action="{{ path('app_types_offres_delete', {'id': types_offre.id}) }}"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Supprimer ce type d’offre ? Cette action est irréversible.');">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ types_offre.id) }}">
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash3 me-1"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
 {% endblock %}

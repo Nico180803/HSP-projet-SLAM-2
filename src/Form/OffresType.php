@@ -30,15 +30,8 @@ class OffresType extends AbstractType
                 'class' => TypesOffres::class,
                 'choice_label' => 'libelle',
             ])
-            ->add('refCreateur', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'nom',
-            ])
-            ->add('refUser', EntityType::class, [
-                'class' => User::class,
-                'choice_label' => 'nom',
-                'multiple' => true,
-            ])
+
+
         ;
     }
 
