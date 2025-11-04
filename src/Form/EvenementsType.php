@@ -38,7 +38,6 @@ class EvenementsType extends AbstractType
             ])
             ->add('responsables', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => 'id',
                 'multiple' => true,
                 'expanded' => false,
                 'required' => false,

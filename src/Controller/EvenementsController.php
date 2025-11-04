@@ -21,7 +21,7 @@ final class EvenementsController extends AbstractController
         $user = $this->getUser();
 
         // Les non-admins ne voient que les événements validés ou dont ils sont responsables
-        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_MEDECIN')) {
             $evenements = $evenementsRepository->createQueryBuilder('e')
                 ->leftJoin('e.userEvenements', 'ue')
                 ->andWhere('e.est_valide = true OR (ue.refUser = :user AND ue.isResponsable = true)')
@@ -62,7 +62,7 @@ final class EvenementsController extends AbstractController
             }
 
             // Si l’utilisateur n’est pas admin/prof, l’événement doit être validé plus tard
-            if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF')) {
+            if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_MEDECIN')) {
                 $evenement->setEstValide(false);
             }
 
@@ -112,7 +112,7 @@ final class EvenementsController extends AbstractController
         // Restrictions d’accès
         if (
             !$this->isGranted('ROLE_ADMIN') &&
-            !$this->isGranted('ROLE_PROF') &&
+            !$this->isGranted('ROLE_MEDECIN') &&
             !$evenement->isEstValide() &&
             !$isResponsable
         ) {
@@ -134,7 +134,7 @@ final class EvenementsController extends AbstractController
         });
 
         // Vérifie les droits
-        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$isResponsable) {
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_MEDECIN') && !$isResponsable) {
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de modifier cet événement.');
         }
 
@@ -196,7 +196,7 @@ final class EvenementsController extends AbstractController
             return $ue->getRefUser() === $user && $ue->isResponsable();
         });
 
-        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_PROF') && !$isResponsable) {
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_MEDECIN') && !$isResponsable) {
             throw $this->createAccessDeniedException('Vous n’avez pas la permission de supprimer cet événement.');
         }
 
