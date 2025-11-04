@@ -34,7 +34,7 @@
                     {% endfor %}
 
                     {# FORMULAIRE #}
-                    <form method="post">
+                    {{ form_start(demande, {'attr': {'novalidate': 'novalidate'}}) }}
                         <div class="mb-3">
 
                             <div class="mb-3">
@@ -44,16 +44,10 @@
                             </div>
                         </div>
 
-                        {# CSRF optionnel si tu le passes depuis le contrôleur #}
-                        {% if csrf_token is defined %}
-                            <input type="hidden" name="_token" value="{{ csrf_token }}">
-                        {% endif %}
-
                         {{ form_widget(demande.submit, {'attr': {'class': 'btn btn-primary w-100'}}) }}
 
-                    </form>
+                    {{ form_end(demande) }}
 
-                    {# SÉPARATEUR "ou" #}
                     <div class="text-center my-4 text-muted small position-relative">
                         <hr class="opacity-25 m-0">
                         <span class="bg-white px-2 position-absolute start-50 translate-middle"
