@@ -119,8 +119,12 @@ final class OffresController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+            if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+                return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
+            }else{
+                return $this->redirectToRoute('app_offres_view', [], Response::HTTP_SEE_OTHER);
+            }
 
-            return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('offres/edit.html.twig', [
