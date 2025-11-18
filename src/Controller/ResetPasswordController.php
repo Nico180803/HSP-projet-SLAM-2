@@ -3,8 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\RegistrationFormType;
-use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -33,15 +31,15 @@ final class ResetPasswordController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             try {
-                $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $form->getData()['email']]);
+                $user = $entityManager->getRepository(User::class)->findOneBy(['email' => $form->get('email')->getData()]);
                 $user->setResetToken(uniqid());
                 $entityManager->flush();
                 try {
                     $email = (new Email())
                         ->from('support.hsp@hoziodev.fr')
-                        ->to($form->getData()['email'])
+                        ->to($form->get('email')->getData())
                         ->subject('Réinitialisation de votre mot de passe')
-                        ->text('http://127.0.0.1:8000/reset_password/?token=' . $user->getResetToken());
+                        ->text('Bonjour voici le lien pour réinitialiser votre mot de passe http://127.0.0.1:8000/reset_password/?token=' . $user->getResetToken());
                     $mailer->send($email);
                     $this->addFlash('success', 'Un mail vous a été envoyé');
                 } catch (\Exception $e) {
@@ -50,12 +48,11 @@ final class ResetPasswordController extends AbstractController
             }catch (\Exception $e){
                 $this->addFlash('error', 'le compte n\'existe pas : ' . $e->getMessage());
             }
-
         }
 
         return $this->render('reset_password/index.html.twig', [
             'controller_name' => 'ResetPasswordController',
-            'demande'  => $form->createView(),
+            'demande'  => $form,
         ]);
     }
 
@@ -92,8 +89,7 @@ final class ResetPasswordController extends AbstractController
 
         return $this->render('reset_password/reset_password.html.twig', [
             'controller_name' => 'ResetPasswordController',
-            'form' => $form->createView(),
-
+            'form' => $form,
         ]);
     }
 }
