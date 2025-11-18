@@ -4,44 +4,69 @@
 
 {% block body %}
     {{ parent() }}
-    <h1>Offres</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ offre.id }}</td>
-            </tr>
-            <tr>
-                <th>Titre</th>
-                <td>{{ offre.titre }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ offre.description }}</td>
-            </tr>
-            <tr>
-                <th>Salaire</th>
-                <td>{{ offre.salaire }}</td>
-            </tr>
-            <tr>
-                <th>Date_creation</th>
-                <td>{{ offre.dateCreation ? offre.dateCreation|date('Y-m-d')}}</td>
-            </tr>
-            <tr>
-                <th>Date_fermeture</th>
-                <td>{{ offre.dateFermeture ? offre.dateFermeture|date('Y-m-d') }}</td>
-            </tr>
-            <tr>
-                <th>Pj</th>
-                <td>{{ offre.pj }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-    <a href="{{ path('app_offres_index') }}">back to list</a>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Détail de l’offre</h2>
+                    <p class="text-muted mb-0">Informations complètes de l’offre</p>
+                </div>
+                <div class="d-inline-flex align-items-center gap-2">
+                    {% if 'ROLE_ADMIN' in app.user.roles %}
+                        <a href="{{ path('app_offres_index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                    {% else %}
+                        <a href="{{ path('app_offres_view') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                    {% endif %}
+                    <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    {{ include('offres/_delete_form.html.twig', { offre: offre, size: 'sm' }) }}
+                </div>
+            </div>
 
-    <a href="{{ path('app_offres_edit', {'id': offre.id}) }}">edit</a>
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <table class="table mb-0">
+                        <tbody>
+                        <tr>
+                            <th scope="row" style="width: 200px;">Id</th>
+                            <td>{{ offre.id }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Titre</th>
+                            <td>{{ offre.titre }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Description</th>
+                            <td>{{ offre.description }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Salaire</th>
+                            <td>{{ offre.salaire }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date de création</th>
+                            <td>{{ offre.dateCreation ? offre.dateCreation|date('Y-m-d') }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Date de fermeture</th>
+                            <td>{{ offre.dateFermeture ? offre.dateFermeture|date('Y-m-d') }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">PJ</th>
+                            <td>{{ offre.pj }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-    {{ include('offres/_delete_form.html.twig') }}
+        </div>
+    </section>
 {% endblock %}

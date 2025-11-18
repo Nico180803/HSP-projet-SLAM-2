@@ -20,7 +20,7 @@ class RegistrationFormType extends AbstractType
         $builder
             ->add('role', ChoiceType::class, [
                 'choices' => [
-                    'Etudiant' => 'ROLE_USER',
+                    'Etudiant' => 'ROLE_ETUDIANT',
                     'Médecin' => 'ROLE_MEDECIN',
                     'Entreprise' => 'ROLE_ENTREPRISE',
                 ],

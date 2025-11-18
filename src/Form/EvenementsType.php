@@ -17,24 +17,38 @@ class EvenementsType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $userRoles = $options['user_roles'] ?? [];
-        $isAdminOrProf = in_array('ROLE_ADMIN', $userRoles) || in_array('ROLE_PROF', $userRoles);
-
+        $isAdminOrProf = in_array('ROLE_ADMIN', $userRoles) || in_array('ROLE_MEDECIN', $userRoles);
         $builder
-            ->add('titre')
-            ->add('description')
-            ->add('ville')
-            ->add('rue')
-            ->add('cp')
-            ->add('nb_rue')
-            ->add('nb_places')
-            ->add('nb_places_dispo')
+            ->add('titre', null, [
+                'label' => 'Titre',
+            ])
+            ->add('description', null, [
+                'label' => 'Description',
+            ])
+            ->add('ville', null, [
+                'label' => 'Ville',
+            ])
+            ->add('rue', null, [
+                'label' => 'Rue',
+            ])
+            ->add('cp', null, [
+                'label' => 'Code Postal',
+            ])
+            ->add('nb_rue', null, [
+                'label' => 'Numéro de rue',
+            ])
+            ->add('nb_places',null, [
+                'label' => 'Nombre de places',
+            ])
             ->add('est_valide', CheckboxType::class, [
                 'disabled' => !$isAdminOrProf,
                 'required' => false,
+                'label' => 'Validité'
             ])
             ->add('refTypesEvenement', EntityType::class, [
                 'class' => TypesEvenements::class,
-                'choice_label' => 'id',
+                'choice_label' => 'libelle',
+                'label' => "Type d'évenement",
             ])
             ->add('responsables', EntityType::class, [
                 'class' => User::class,
