@@ -209,45 +209,68 @@ final class EvenementsController extends AbstractController
         return $this->redirectToRoute('app_evenements_index');
     }
 
+    // Pour s'inscrire
     #[Route('/{id}/join', name: 'app_evenement_join')]
     public function join(Evenements $evenement, EntityManagerInterface $em): Response
     {
         $user = $this->getUser();
-
         if (!$user) {
-            $this->addFlash('error', 'Vous devez être connecté pour rejoindre un événement.');
+            $this->addFlash('error', 'Vous devez être connecté.');
             return $this->redirectToRoute('app_login');
         }
 
-        // Vérifie les places disponibles
-        if ($evenement->getNbPlacesDispo() <= 0) {
-            $this->addFlash('error', 'Plus de places disponibles.');
-            return $this->redirectToRoute('app_evenements_index');
-        }
-
-        // Vérifie si déjà inscrit
+        // Déjà inscrit ?
         $alreadyRegistered = $evenement->getUserEvenements()->exists(function($key, $ue) use ($user) {
             return $ue->getRefUser() === $user;
         });
 
         if ($alreadyRegistered) {
-            $this->addFlash('warning', 'Vous êtes déjà inscrit à cet événement.');
-            return $this->redirectToRoute('app_evenements_index');
+            $this->addFlash('warning', 'Vous êtes déjà inscrit.');
+            return $this->redirectToRoute('app_evenements_show', ['id' => $evenement->getId()]);
         }
 
-        // Inscription
         $userEvenement = new UserEvenement();
         $userEvenement->setRefUser($user);
         $userEvenement->setRefEvenement($evenement);
         $userEvenement->setIsResponsable(false);
         $em->persist($userEvenement);
 
-        // Mise à jour des places
         $evenement->setNbPlacesDispo($evenement->getNbPlacesDispo() - 1);
 
         $em->flush();
-        $this->addFlash('success', 'Vous êtes inscrit à l’événement !');
+        $this->addFlash('success', 'Vous êtes inscrit !');
 
-        return $this->redirectToRoute('app_evenements_index');
+        return $this->redirectToRoute('app_evenements_show', ['id' => $evenement->getId()]);
+    }
+
+// Pour se désinscrire
+    #[Route('/{id}/leave', name: 'app_evenement_leave')]
+    public function leave(Evenements $evenement, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            $this->addFlash('error', 'Vous devez être connecté.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        $userEvenement = null;
+        foreach ($evenement->getUserEvenements() as $ue) {
+            if ($ue->getRefUser()->getId() === $user->getId() && !$ue->isResponsable()) {
+                $userEvenement = $ue;
+                break;
+            }
+        }
+
+        if (!$userEvenement) {
+            $this->addFlash('warning', 'Vous n’êtes pas inscrit ou êtes responsable.');
+            return $this->redirectToRoute('app_evenements_show', ['id' => $evenement->getId()]);
+        }
+
+        $em->remove($userEvenement);
+        $evenement->setNbPlacesDispo($evenement->getNbPlacesDispo() + 1);
+        $em->flush();
+
+        $this->addFlash('success', 'Vous vous êtes désinscrit.');
+        return $this->redirectToRoute('app_evenements_show', ['id' => $evenement->getId()]);
     }
 }
