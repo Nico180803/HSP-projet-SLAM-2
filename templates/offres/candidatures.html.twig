@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Candidatures – {{ offre.titre }}{% endblock %}
+
+{% block body %}
+    {{ parent() }}
+
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Candidatures</h2>
+                    <p class="text-muted mb-0">Offre : {{ offre.titre }}</p>
+                </div>
+                <a href="{{ path('app_offres_view') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Retour aux offres
+                </a>
+            </div>
+
+            {% if candidats is empty %}
+                <div class="card shadow-sm border-0">
+                    <div class="card-body text-center p-5">
+                        <i class="bi bi-people display-5 d-block mb-3"></i>
+                        <h5 class="fw-semibold mb-2">Aucune candidature pour le moment</h5>
+                        <p class="text-muted mb-0">Vous serez notifié quand des utilisateurs postuleront.</p>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th>Utilisateur</th>
+                                    <th>Email</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for user in candidats %}
+                                    <tr>
+                                        <td>{{ user.username ?? user.userIdentifier ?? '—' }}</td>
+                                        <td>{{ user.email ?? '—' }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+{% endblock %}
