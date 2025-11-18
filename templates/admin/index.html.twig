@@ -68,9 +68,10 @@
                                            class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a href="{{ path('app_evenements_delete', {id: evenement.id}) }}"
+                                        {{ include('evenements/_delete_hidden.html.twig') }}
+                                        <a href="#"
                                            class="btn btn-sm btn-outline-danger"
-                                            onclick="return confirm('Supprimer cet utilisateur ?');">
+                                           onclick="document.getElementById('delete_evenements_{{ evenement.id }}_form').requestSubmit()">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </td>
