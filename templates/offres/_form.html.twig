@@ -1,4 +1,55 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{# Thème Bootstrap 5 pour les formulaires #}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{{ form_start(form, {
+    attr: { class: 'needs-validation', novalidate: 'novalidate' }
+}) }}
+
+<div class="row g-3">
+    {# On génère tous les champs (sauf _token), proprement #}
+    {% for child in form %}
+        {% if child.vars.name != '_token' %}
+            <div class="col-12">
+                {{ form_row(child, {
+                    row_attr: { class: 'mb-3' }
+                }) }}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="d-flex align-items-center gap-2 mt-4">
+    <button class="btn btn-primary">
+        <i class="bi bi-check2-circle me-1"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+
+    {# On renvoie vers la bonne liste : admin -> index, sinon -> view #}
+    {% if 'ROLE ADMIN' in app.user.roles %}
+        <a href="{{ path('app_offres_index') }}" class="btn btn-outline-secondary">
+            Annuler
+        </a>
+    {% else %}
+        <a href="{{ path('app_offres_view') }}" class="btn btn-outline-secondary">
+            Annuler
+        </a>
+    {% endif %}
+</div>
+
 {{ form_end(form) }}
+
+<script>
+    // Validation Bootstrap
+    (function () {
+        'use strict';
+        var forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>

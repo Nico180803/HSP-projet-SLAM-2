@@ -1,19 +1,40 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Offres{% endblock %}
+{% block title %}Modifier une offre{% endblock %}
 
 {% block body %}
     {{ parent() }}
-    <h1>Edit Offres</h1>
 
-    {{ include('offres/_form.html.twig', {'button_label': 'Update'}) }}
-    {% if 'ROLE ADMIN' in app.user.roles %}
-    <a href="{{ path('app_offres_index') }}">back to list</a>
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-    {{ include('offres/_delete_form.html.twig') }}
-    {% else %}
-    <a href="{{ path('app_offres_view') }}">back to list</a>
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Modifier l’offre</h2>
+                    <p class="text-muted mb-0">Mettez à jour les informations de l’offre</p>
+                </div>
 
-    {{ include('offres/_delete_form.html.twig') }}
-    {% endif %}
+                <div class="d-inline-flex align-items-center gap-2">
+                    {% if 'ROLE ADMIN' in app.user.roles %}
+                        <a href="{{ path('app_offres_index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                    {% else %}
+                        <a href="{{ path('app_offres_view') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                    {% endif %}
+
+                    {{ include('offres/_delete_form.html.twig', { offre: offre, size: 'sm' }) }}
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                <div class="card-body p-4">
+                    {{ include('offres/_form.html.twig', { button_label: 'Mettre à jour l\'offre' }) }}
+                </div>
+            </div>
+
+        </div>
+    </section>
 {% endblock %}

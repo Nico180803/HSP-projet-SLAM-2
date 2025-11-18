@@ -57,17 +57,24 @@ final class OffresController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
         if (!in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
-            return $this->redirectToRoute('app_home');
+            if (!in_array('ROLE_ENTREPRISE', $this->getUser()->getRoles())){
+                return $this->redirectToRoute('app_home');
+            }
+
         }
         $offre = new Offres();
         $form = $this->createForm(OffresType::class, $offre);
         $form->handleRequest($request);
-
+        $offre->setRefCreateur($this->getUser());
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($offre);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
+            if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+                return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
+            }else{
+                return $this->redirectToRoute('app_offres_view', [], Response::HTTP_SEE_OTHER);
+            }
         }
 
         return $this->render('offres/new.html.twig', [
@@ -119,6 +126,7 @@ final class OffresController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+
             if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
                 return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
             }else{

@@ -23,8 +23,13 @@ class OffresType extends AbstractType
             ->add('date_fermeture')
             ->add('contactsEntreprises', EntityType::class, [
                 'class' => ContactsEntreprise::class,
-                'choice_label' => 'id',
-                'multiple' => true,
+                'choice_label' => function (ContactsEntreprise $c) {
+                    return sprintf('%s %s (%s)', $c->getPrenom(), $c->getNom(), $c->getFonction());
+                },
+                'multiple'    => true,    // Collection => DOIT rester true
+                'expanded'    => true,    // cases à cocher
+                'by_reference'=> false,   // bon réflexe sur ManyToMany
+                'label'       => 'Contact entreprise',
             ])
             ->add('refTypesOffre', EntityType::class, [
                 'class' => TypesOffres::class,
