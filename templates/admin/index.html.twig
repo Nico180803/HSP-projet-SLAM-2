@@ -5,6 +5,7 @@
 
 {% block body %}
 
+
     {{ parent() }}
 
     <div class="container-fluid py-4">
@@ -109,45 +110,19 @@
                     </div>
 
                     <ul class="list-group list-group-flush">
-                        {% for post in lastForumPosts ?? [
-                            {
-                                author:'amelie.d',
-                                topic:'[INFOS STAGE] Convention à rendre ?',
-                                excerpt:'Bonjour, est-ce qu’on doit rendre la convention signée avant le 15...',
-                                createdAt:'il y a 2h',
-                                flagged:false,
-                                id:10
-                            },
-                            {
-                                author:'kylian.m',
-                                topic:'Sortie pédagogique à Paris',
-                                excerpt:'Je voulais savoir si le départ se fait bien à 7h15 devant le lycée ?',
-                                createdAt:'il y a 5h',
-                                flagged:true,
-                                id:11
-                            }
-                        ] %}
+                        {% for post in sujets %}
                             <li class="list-group-item">
                                 <div class="d-flex justify-content-between">
                                     <div class="me-3">
                                         <div class="d-flex align-items-center">
-                                            <span class="fw-semibold">{{ post.author }}</span>
-                                            {% if post.flagged %}
-                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle ms-2">
-                                                Signalé
-                                            </span>
-                                            {% endif %}
+                                            <span class="fw-semibold">{{ post.titre }}</span>
                                         </div>
                                         <div class="small text-muted">
-                                            dans <span class="fw-semibold">{{ post.topic }}</span>
-                                        </div>
-                                        <div class="small text-body mt-1">
-                                            {{ post.excerpt }}
+                                            <span class="fw-semibold">{{ post.message }}</span>
                                         </div>
                                     </div>
 
                                     <div class="text-end small text-muted">
-                                        <div>{{ post.createdAt }}</div>
                                         <div class="mt-2 d-flex flex-column gap-1">
                                             <a href="{{ path('app_flux_show', {id: post.id}) }}"
                                                class="btn btn-sm btn-outline-secondary">

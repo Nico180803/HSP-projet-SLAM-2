@@ -65,7 +65,7 @@
                                 </p>
                                 <hr>
 
-                                {% if 'ROLE_USER' in roles %}
+                                {% if 'ROLE_ETUDIANT' in roles %}
                                     <h5>Informations Étudiant</h5>
                                     <p><strong>CV:</strong>
                                     {% if app.user.cv %}
@@ -78,8 +78,8 @@
                                     <p><strong>Formation:</strong> {{ user.formation }}</p>
                                 {% endif %}
 
-                                {% if 'ROLE_PROF' in roles %}
-                                    <h5>Informations Professeur</h5>
+                                {% if 'ROLE_MEDECIN' in roles %}
+                                    <h5>Informations Medecin</h5>
                                     <p><strong>Spécialité:</strong> {{ user.specialite }}</p>
                                 {% endif %}
 

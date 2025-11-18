@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: UserEvenementRepository::class)]
 class UserEvenement
 {
+    #[ORM\ManyToOne(targetEntity: Evenements::class, inversedBy: 'userEvenements')]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

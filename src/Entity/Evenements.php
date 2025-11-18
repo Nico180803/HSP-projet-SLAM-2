@@ -37,18 +37,11 @@ class Evenements
     #[ORM\Column]
     private ?int $nb_places = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evenements')]
+     #[ORM\Column]
+     private ?bool $est_valide = false;
+
+     #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'evenements')]
     private Collection $participants;
-
-    #[ORM\Column]
-    private ?int $nb_places_dispo = null;
-
-    #[ORM\Column]
-    private ?bool $est_valide = false;
-
-    #[ORM\ManyToOne(inversedBy: 'evenements')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?TypesEvenements $refTypesEvenement = null;
 
     #[ORM\ManyToMany(targetEntity: User::class)]
     #[ORM\JoinTable(name: 'evenement_inscrits')]
@@ -57,11 +50,16 @@ class Evenements
     #[ORM\ManyToMany(targetEntity: User::class)]
     #[ORM\JoinTable(name: 'evenement_responsables')]
     private Collection $responsables;
+    #[ORM\Column]
+    private ?int $nb_places_dispo = null;
+    #[ORM\ManyToOne(inversedBy: 'evenements')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TypesEvenements $refTypesEvenement = null;
 
     /**
      * @var Collection<int, UserEvenement>
      */
-    #[ORM\OneToMany(targetEntity: UserEvenement::class, mappedBy: 'refEvenement', orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'refEvenement', targetEntity: UserEvenement::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $userEvenements;
 
     #[ORM\Column]
@@ -69,7 +67,6 @@ class Evenements
 
     #[ORM\Column]
     private ?\DateTime $date_fin = null;
-
     public function __construct()
     {
         $this->inscrits = new ArrayCollection();
@@ -109,7 +106,6 @@ class Evenements
         $this->participants->add($user);}
         return $this;
     }
-    
     public function isEstValide(): ?bool { return $this->est_valide; }
     public function setEstValide(bool $est_valide): static { $this->est_valide = $est_valide; return $this; }
 
