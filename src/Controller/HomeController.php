@@ -67,8 +67,12 @@ class HomeController extends AbstractController
                 $email = (new Email())
                     ->from('support.hsp@hoziodev.fr')
                     ->to($form->getData()['email'])
-                    ->subject($form->getData()['sujet'])
-                    ->text($form->getData()['demande']);
+                    ->subject('Demande de support : Sujet : '. $form->get('sujet')->getData())
+                    ->html('<h1>Demande de support</h1>
+                                  <h4>Bonjour, vous avez fait une demande de support.</h4>
+                                  <h4>Voici votre demande :</h4>
+                                  <h4>Sujet : '. $form->get('sujet')->getData() .'</h4>
+                                  <h4>Demande : '. $form->get('demande')->getData() .'</h4>');
                 $mailer->send($email);
                 $this->addFlash('success', 'Reussi');
             } catch (\Exception $e) {
