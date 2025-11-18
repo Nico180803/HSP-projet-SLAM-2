@@ -169,13 +169,20 @@ final class OffresController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
         if (!in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
-            return $this->redirectToRoute('app_home');
+            if (!in_array('ROLE_ENTREPRISE', $this->getUser()->getRoles())){
+                return $this->redirectToRoute('app_home');
+            }
+
         }
         if ($this->isCsrfTokenValid('delete'.$offre->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($offre);
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
+        if (in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+            return $this->redirectToRoute('app_offres_index', [], Response::HTTP_SEE_OTHER);
+        }else{
+            return $this->redirectToRoute('app_offres_view', [], Response::HTTP_SEE_OTHER);
+        }
     }
 }

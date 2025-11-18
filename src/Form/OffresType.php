@@ -26,9 +26,9 @@ class OffresType extends AbstractType
                 'choice_label' => function (ContactsEntreprise $c) {
                     return sprintf('%s %s (%s)', $c->getPrenom(), $c->getNom(), $c->getFonction());
                 },
-                'multiple'    => true,    // Collection => DOIT rester true
-                'expanded'    => true,    // cases à cocher
-                'by_reference'=> false,   // bon réflexe sur ManyToMany
+                'multiple'    => true,
+                'expanded'    => true,
+                'by_reference'=> false,
                 'label'       => 'Contact entreprise',
             ])
             ->add('refTypesOffre', EntityType::class, [
