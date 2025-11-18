@@ -16,6 +16,14 @@ class SujetsRepository extends ServiceEntityRepository
         parent::__construct($registry, Sujets::class);
     }
 
+    public function getLastSujet($number){
+        $query = $this->createQueryBuilder('e');
+        $query->orderBy('e.id', 'DESC');
+        $query->setMaxResults($number);
+
+        return $query->getQuery()->getResult();
+    }
+
     //    /**
     //     * @return Sujets[] Returns an array of Sujets objects
     //     */
