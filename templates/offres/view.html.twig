@@ -9,51 +9,49 @@
             </div>
             <div class="text-center mt-4">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                {% if 'ROLE_ENTREPRISE' in app.user.roles %}
-                <a href="{{ path('app_offres_new') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="150">
-                    <i class="bi bi-person-plus-fill me-2"></i>Créer une nouvel offre
-                </a>
-                {% endif %}
+                    {% if 'ROLE_ENTREPRISE' in app.user.roles %}
+                        <a href="{{ path('app_offres_new') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="150">
+                            <i class="bi bi-person-plus-fill me-2"></i>Créer une nouvelle offre
+                        </a>
+                    {% endif %}
                 {% endif %}
             </div>
             <hr data-aos="fade-up" data-aos-delay="150">
 
-
             <div class="row">
                 <form method="get" action="{{ path('app_offres_view') }}" class="mb-4 d-flex" role="search">
-                    {# <label>
-                        <input type="text" name="search" value="{{ app.request.get('search') }}" class="form-control me-2" placeholder="Rechercher un utilisateur...">
-                    </label> #}
+                    {#
+                    <label>
+                        <input type="text" name="search" value="{{ app.request.get('search') }}" class="form-control me-2" placeholder="Rechercher une offre...">
+                    </label>
+                    #}
                     <button type="submit" class="btn btn-primary">Rechercher</button>
                 </form>
-                {% for offre in pagination %}
 
+                {% for offre in pagination %}
                     <div class="col-md-3 col-lg-4 mb-2" data-aos="fade-up" data-aos-delay="{{ 200 + loop.index * 50 }}">
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
                                 <h5 class="card-title">
-                                    {#                                    <i class="bi bi-building">#}
                                     <i class="bi bi-person-circle me-2"></i>{{ offre.titre }}
                                     <span class="badge bg-primary-subtle text-dark">
                                         {% if offre.refUser %}
-                                             Nombre de candidature: {{ offre.refUser|length }}
+                                            Nombre de candidature: {{ offre.refUser|length }}
                                         {% else %}
                                             Nombre de candidature: 0
                                         {% endif %}
-                                        </span>
+                                    </span>
                                 </h5>
                                 <p class="card-text mb-2">
                                     <strong>Salaire:</strong>
-
                                     <span class="badge bg-primary-subtle text-dark">
-                                             {{ offre.salaire }} euros
-                                        </span>
+                                        {{ offre.salaire }} euros
+                                    </span>
                                     <br>
                                     <strong>Date de création:</strong> {{ offre.dateCreation|date('d/m/Y') }} <br>
-                                    <strong>  Date de création:</strong> {{ offre.dateFermeture|date('d/m/Y') }}<br>
-                                    <strong>Contact:</strong> a faire
+                                    <strong>Date de fermeture:</strong> {{ offre.dateFermeture|date('d/m/Y') }}<br>
+                                    <strong>Contact:</strong> à faire
                                 </p>
-
 
                                 <p class="small text-muted">
                                     <strong>Description:</strong> {{ offre.description }}
@@ -64,12 +62,13 @@
                                         <i class="bi bi-eye"></i> Voir
                                     </a>
 
-
-
-                                    {% if 'ROLE_ENTREPRISE' in app.user.roles %}{# ajouter une condition seulement l'entreprise qui a creer peut modifier #}
-                                    <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
-                                        <i class="bi bi-pencil"></i> Modifier
-                                    </a>
+                                    {% if 'ROLE_ENTREPRISE' in app.user.roles %}
+                                        <div class="d-inline-flex gap-2">
+                                            <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-pencil"></i> Modifier
+                                            </a>
+                                            {{ include('offres/_delete_form.html.twig', { offre: offre, size: 'sm' }) }}
+                                        </div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -82,6 +81,7 @@
                         </div>
                     </div>
                 {% endfor %}
+
                 <div class="d-flex justify-content-center mt-4">
                     {{ knp_pagination_render(pagination) }}
                 </div>

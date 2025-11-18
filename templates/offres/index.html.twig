@@ -1,48 +1,118 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Offres index{% endblock %}
+{% block title %}Offres – Liste{% endblock %}
 
 {% block body %}
     {{ parent() }}
-    <h1>Offres index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Titre</th>
-                <th>Description</th>
-                <th>Salaire</th>
-                <th>Date_creation</th>
-                <th>Date_fermeture</th>
-                <th>Pj</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for offre in offres %}
-            <tr>
-                <td>{{ offre.id }}</td>
-                <td>{{ offre.titre }}</td>
-                <td>{{ offre.description }}</td>
-                <td>{{ offre.salaire }}</td>
-                <td>{{ offre.dateCreation ? offre.dateCreation|date('Y-m-d')}}</td>
-                <td>{{ offre.dateFermeture ? offre.dateFermeture|date('Y-m-d')}}</td>
-                <td>{{ offre.pj }}</td>
-                <td>
-                    <a href="{{ path('app_offres_show', {'id': offre.id}) }}">show</a>
-                    <a href="{{ path('app_offres_edit', {'id': offre.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="8">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-    <a href="{{ path('app_offres_new') }}">Create new</a>
-    <br>
-    <a href="{{ path('app_types_offres_index') }}">Voir les types d'offres</a>
+            <!-- Titre + actions -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Offres</h2>
+                    <p class="text-muted mb-0">Gérez l’ensemble des offres publiées</p>
+                </div>
+                <div class="d-inline-flex align-items-center gap-2">
+                    <a href="{{ path('app_types_offres_index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-tags me-1"></i> Types d'offres
+                    </a>
+                    <a href="{{ path('app_offres_new') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Nouvelle offre
+                    </a>
+                </div>
+            </div>
+
+            {% if offres is empty %}
+                <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card-body p-5 text-center">
+                        <i class="bi bi-briefcase display-5 d-block mb-3"></i>
+                        <h5 class="fw-semibold mb-2">Aucune offre enregistrée</h5>
+                        <p class="text-muted mb-0">
+                            Créez votre première offre pour qu’elle apparaisse ici.
+                        </p>
+                        <a href="{{ path('app_offres_new') }}" class="btn btn-primary mt-3">
+                            <i class="bi bi-plus-circle me-1"></i> Créer une offre
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                <tr>
+                                    <th style="width: 80px;">ID</th>
+                                    <th>Titre</th>
+                                    <th style="width: 140px;">Salaire</th>
+                                    <th style="width: 140px;">Création</th>
+                                    <th style="width: 140px;">Fermeture</th>
+                                    <th>Pièce jointe</th>
+                                    <th class="text-end" style="width: 260px;">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for offre in offres %}
+                                    <tr>
+                                        <td>
+                      <span class="badge bg-secondary-subtle text-secondary-emphasis border">
+                        #{{ offre.id }}
+                      </span>
+                                        </td>
+                                        <td class="fw-semibold">
+                                            {{ offre.titre }}
+                                            {% if offre.description %}
+                                                <div class="small text-muted">
+                                                    {{ offre.description|length > 80 ? offre.description|slice(0, 80) ~ '…' : offre.description }}
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if offre.salaire is not null %}
+                                                <span class="badge bg-primary-subtle text-dark">
+                          {{ offre.salaire }} €
+                        </span>
+                                            {% else %}
+                                                <span class="text-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{ offre.dateCreation ? offre.dateCreation|date('d/m/Y') : '—' }}
+                                        </td>
+                                        <td>
+                                            {{ offre.dateFermeture ? offre.dateFermeture|date('d/m/Y') : '—' }}
+                                        </td>
+                                        <td>
+                                            {% if offre.pj %}
+                                                <span class="badge bg-success-subtle text-success">
+                          <i class="bi bi-paperclip me-1"></i> {{ offre.pj }}
+                        </span>
+                                            {% else %}
+                                                <span class="text-muted">Aucune</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-inline-flex align-items-center gap-2">
+                                                <a href="{{ path('app_offres_show', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="bi bi-eye me-1"></i> Voir
+                                                </a>
+                                                <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-pencil-square me-1"></i> Modifier
+                                                </a>
+                                                {{ include('offres/_delete_form.html.twig', { offre: offre, size: 'sm' }) }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
 {% endblock %}

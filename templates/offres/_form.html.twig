@@ -24,7 +24,7 @@
     </button>
 
     {# On renvoie vers la bonne liste : admin -> index, sinon -> view #}
-    {% if 'ROLE ADMIN' in app.user.roles %}
+    {% if 'ROLE_ADMIN' in app.user.roles %}
         <a href="{{ path('app_offres_index') }}" class="btn btn-outline-secondary">
             Annuler
         </a>

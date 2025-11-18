@@ -1,9 +1,7 @@
 {% extends 'base.html.twig' %}
 
-
 {% block body %}
     {{ parent() }}
-
 
     <section id="user-profile" class="section py-5 bg-light">
         <div class="container" data-aos="fade-up">
@@ -18,47 +16,41 @@
                                 </div>
                                 <div>
                                     <h4 class="card-title mb-0">{{ offre.titre }}</h4>
-
                                 </div>
                             </div>
 
-
-                                <div class="row mb-4">
-                                    <div class="col-md-6">
-                                        <p><strong>Salaire:</strong> {{ offre.salaire }}</p>
-                                        <p><strong>Date de création:</strong> {{ offre.dateCreation|date('d/m/Y') }}</p>
-                                        <p><strong>Date de fermeture:</strong> {{ offre.dateFermeture|date('d/m/Y') }}</p>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <p><strong>Contact: </strong>test</p>
-
-                                    </div>
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <p><strong>Salaire:</strong> {{ offre.salaire }}</p>
+                                    <p><strong>Date de création:</strong> {{ offre.dateCreation|date('d/m/Y') }}</p>
+                                    <p><strong>Date de fermeture:</strong> {{ offre.dateFermeture|date('d/m/Y') }}</p>
                                 </div>
+                                <div class="col-md-6">
+                                    <p><strong>Contact: </strong>test</p>
+                                </div>
+                            </div>
 
-
-
-
-
-
-
-
-
-
-
-
+                            <p><strong>Description :</strong></p>
+                            <p>{{ offre.description }}</p>
 
                             <div class="d-flex justify-content-between mt-4">
-
+                                {% if 'ROLE_ADMIN' in app.user.roles %}
+                                    <a href="{{ path('app_offres_index') }}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                                    </a>
+                                {% else %}
                                     <a href="{{ path('app_offres_view') }}" class="btn btn-outline-secondary">
-                                        <i class="bi bi-arrow-left"></i> Retour à la liste
+                                        <i class="bi bi-arrow-left me-1"></i> Retour à la liste
                                     </a>
+                                {% endif %}
 
-                                {% if 'ROLE_ENTREPRISE' in app.user.roles %} {# ajouter une condition seulement l'entreprise qui a creer peut modifier #}
-                                <div class="d-flex gap-2">
-                                    <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-outline-primary">
-                                        <i class="bi bi-pencil"></i> Modifier
-                                    </a>
-                                </div>
+                                {% if 'ROLE_ENTREPRISE' in app.user.roles %}
+                                    <div class="d-inline-flex gap-2">
+                                        <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil"></i> Modifier
+                                        </a>
+                                        {{ include('offres/_delete_form.html.twig', { offre: offre, size: 'sm' }) }}
+                                    </div>
                                 {% endif %}
                             </div>
 
