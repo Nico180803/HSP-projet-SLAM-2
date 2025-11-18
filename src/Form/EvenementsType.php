@@ -34,7 +34,7 @@ class EvenementsType extends AbstractType
             ])
             ->add('refTypesEvenement', EntityType::class, [
                 'class' => TypesEvenements::class,
-                'choice_label' => 'id',
+                'choice_label' => 'libelle',
             ])
             ->add('responsables', EntityType::class, [
                 'class' => User::class,
