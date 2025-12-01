@@ -28,27 +28,47 @@ final class OffresController extends AbstractController
             'offres' => $offresRepository->findAll(),
         ]);
     }
-    #[Route('/view',name: 'app_offres_view', methods: ['GET','POST'])]
-    public function view(PaginatorInterface $paginator,Request $request,OffresRepository $offresRepository): Response
+    #[Route('/view', name: 'app_offres_view', methods: ['GET'])]
+    public function view(PaginatorInterface $paginator, Request $request, OffresRepository $offresRepository): Response
     {
         if ($this->getUser() == null) {
             return $this->redirectToRoute('app_home');
         }
-        if (in_array('ROLE_ENTREPRISE', $this->getUser()->getRoles())) {
-            $offres = $offresRepository->findBy([
-                    'refCreateur' => $this->getUser()
-                ]);
-        }else{
-            $offres = $offresRepository->findAll();
+
+
+        $search = trim((string) $request->query->get('search', ''));
+
+
+        $qb = $offresRepository->createQueryBuilder('o');
+
+
+        if (in_array('ROLE_ENTREPRISE', $this->getUser()->getRoles(), true)) {
+            $qb->andWhere('o.refCreateur = :user')
+                ->setParameter('user', $this->getUser());
         }
 
-        $pagination = $paginator->paginate($offres, $request->query->getInt('page', 1), 6);
-        return $this->render('offres/view.html.twig', [
-            'offres' => $offres,
-            'pagination' => $pagination,
 
+        if ($search !== '') {
+            $qb->andWhere('o.titre LIKE :search OR o.description LIKE :search')
+                ->setParameter('search', '%' . $search . '%');
+        }
+
+
+        $qb->orderBy('o.date_creation', 'DESC');
+
+        // Pagination
+        $pagination = $paginator->paginate(
+            $qb,
+            $request->query->getInt('page', 1),
+            6
+        );
+
+        return $this->render('offres/view.html.twig', [
+            'pagination' => $pagination,
+            'search'     => $search,
         ]);
     }
+
 
     #[Route('/new', name: 'app_offres_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -80,6 +100,46 @@ final class OffresController extends AbstractController
         return $this->render('offres/new.html.twig', [
             'offre' => $offre,
             'form' => $form,
+        ]);
+    }
+
+    #[Route('/offres/{id}/postuler', name: 'app_offres_postuler', methods: ['POST','GET'])]
+    public function postuler(Offres $offre, Request $request, EntityManagerInterface $entityManagerInterface): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+
+        $offre->addRefUser($user);
+
+        $entityManagerInterface->persist($offre);
+        $entityManagerInterface->flush();
+
+        $this->addFlash('success', 'Votre candidature a été enregistrée.');
+
+        return $this->redirectToRoute('app_offres_view');
+    }
+    #[Route('/offres/{id}/candidatures', name: 'app_offres_candidatures', methods: ['GET'])]
+    public function candidatures(Offres $offre): Response
+    {
+        if ($this->getUser() == null) {
+            return $this->redirectToRoute('app_home');
+        }
+        if (!in_array('ROLE_ADMIN', $this->getUser()->getRoles())) {
+            if (!in_array('ROLE_ENTREPRISE', $this->getUser()->getRoles())){
+                return $this->redirectToRoute('app_home');
+            }
+
+        }
+
+        $candidats = $offre->getRefUser();
+
+        return $this->render('offres/candidatures.html.twig', [
+            'offre'     => $offre,
+            'candidats' => $candidats,
         ]);
     }
 

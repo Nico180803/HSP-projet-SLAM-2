@@ -40,6 +40,9 @@ class EvenementsType extends AbstractType
             ->add('nb_places',null, [
                 'label' => 'Nombre de places',
             ])
+            ->add('nb_places_dispo',null,[
+                'label' => 'Nombre de places disponibles',
+            ])
             ->add('est_valide', CheckboxType::class, [
                 'disabled' => !$isAdminOrProf,
                 'required' => false,
