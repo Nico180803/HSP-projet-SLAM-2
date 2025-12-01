@@ -26,7 +26,16 @@
                                     <p><strong>Date de fermeture:</strong> {{ offre.dateFermeture|date('d/m/Y') }}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Contact: </strong>test</p>
+                                    {% set firstContact = offre.contactsEntreprises|first %}
+                                    <strong>Contact :</strong>
+                                    {% if firstContact %}
+                                        {{ firstContact.prenom }} {{ firstContact.nom }}
+                                        {% if firstContact.fonction %} – {{ firstContact.fonction }}{% endif %}<br>
+                                        {% if firstContact.tel %}📞 {{ firstContact.tel }}<br>{% endif %}
+                                        {% if firstContact.mail %}📧 {{ firstContact.mail }}{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Aucun contact renseigné</span>
+                                    {% endif %}
                                 </div>
                             </div>
 

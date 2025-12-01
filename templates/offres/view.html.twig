@@ -2,11 +2,13 @@
 
 {% block body %}
     {{ parent() }}
+
     <section id="users" class="section bg-light py-5">
         <div class="container" data-aos="fade-up" data-aos-delay="100">
             <div class="section-header text-center mb-5">
                 <h2 class="section-title" data-aos="fade-up" data-aos-delay="200">Liste des offres</h2>
             </div>
+
             <div class="text-center mt-4">
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                     {% if 'ROLE_ENTREPRISE' in app.user.roles %}
@@ -16,19 +18,23 @@
                     {% endif %}
                 {% endif %}
             </div>
+
             <hr data-aos="fade-up" data-aos-delay="150">
 
             <div class="row">
                 <form method="get" action="{{ path('app_offres_view') }}" class="mb-4 d-flex" role="search">
-                    {#
-                    <label>
-                        <input type="text" name="search" value="{{ app.request.get('search') }}" class="form-control me-2" placeholder="Rechercher une offre...">
-                    </label>
-                    #}
+                    <input
+                        type="text"
+                        name="search"
+                        class="form-control me-2"
+                        placeholder="Rechercher une offre (titre, description)..."
+                        value="{{ search is defined ? search : app.request.get('search') }}"
+                    >
                     <button type="submit" class="btn btn-primary">Rechercher</button>
                 </form>
 
                 {% for offre in pagination %}
+
                     <div class="col-md-3 col-lg-4 mb-2" data-aos="fade-up" data-aos-delay="{{ 200 + loop.index * 50 }}">
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
@@ -42,6 +48,7 @@
                                         {% endif %}
                                     </span>
                                 </h5>
+
                                 <p class="card-text mb-2">
                                     <strong>Salaire:</strong>
                                     <span class="badge bg-primary-subtle text-dark">
@@ -50,7 +57,16 @@
                                     <br>
                                     <strong>Date de création:</strong> {{ offre.dateCreation|date('d/m/Y') }} <br>
                                     <strong>Date de fermeture:</strong> {{ offre.dateFermeture|date('d/m/Y') }}<br>
-                                    <strong>Contact:</strong> à faire
+                                    {% set firstContact = offre.contactsEntreprises|first %}
+                                    <strong>Contact :</strong>
+                                    {% if firstContact %}
+                                        {{ firstContact.prenom }} {{ firstContact.nom }}
+                                        {% if firstContact.fonction %} – {{ firstContact.fonction }}{% endif %}<br>
+                                        {% if firstContact.tel %}📞 {{ firstContact.tel }}<br>{% endif %}
+                                        {% if firstContact.mail %}📧 {{ firstContact.mail }}{% endif %}
+                                    {% else %}
+                                        <span class="text-muted">Aucun contact renseigné</span>
+                                    {% endif %}
                                 </p>
 
                                 <p class="small text-muted">
@@ -63,12 +79,18 @@
                                     </a>
 
                                     {% if 'ROLE_ENTREPRISE' in app.user.roles %}
-                                        <div class="d-inline-flex gap-2">
-                                            <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
-                                                <i class="bi bi-pencil"></i> Modifier
-                                            </a>
-                                            {{ include('offres/_delete_form.html.twig', { offre: offre, size: 'sm' }) }}
-                                        </div>
+
+                                        <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-pencil"></i> Modifier
+                                        </a>
+                                    {% endif %}
+                                    {% if 'ROLE_ETUDIANT' in app.user.roles %}
+                                            {% if app.user in offre.refUser %}
+
+                                        <a href="{{ path('app_offres_postuler', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-pencil"></i> Postuler
+                                        </a>
+                                            {% endif %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -89,5 +111,4 @@
 
         </div>
     </section>
-
 {% endblock %}
