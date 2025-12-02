@@ -43,11 +43,6 @@ class EvenementsType extends AbstractType
             ->add('nb_places_dispo',null,[
                 'label' => 'Nombre de places disponibles',
             ])
-            ->add('est_valide', CheckboxType::class, [
-                'disabled' => !$isAdminOrProf,
-                'required' => false,
-                'label' => 'Validité'
-            ])
             ->add('refTypesEvenement', EntityType::class, [
                 'class' => TypesEvenements::class,
                 'choice_label' => 'libelle',
@@ -69,6 +64,12 @@ class EvenementsType extends AbstractType
                 'widget' => 'single_text',
                 'label' => 'Date de fin',
             ]);
+            if ($isAdminOrProf) {
+                $builder->add('est_valide', CheckboxType::class, [
+                    'required' => false,
+                    'label' => 'Validité',
+                ]);
+            }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
