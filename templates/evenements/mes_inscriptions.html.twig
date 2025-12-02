@@ -63,10 +63,9 @@
                                     Voir
                                 </a>
 
-                                <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}"
-                                   class="btn btn-outline-warning btn-sm w-100 text-dark">
-                                    Modifier
-                                </a>
+                                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_MEDECIN') %}
+                                    <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}" class="btn btn-outline-warning btn-sm w-100 text-dark">Modifier</a>
+                                {% endif %}
 
                                 <form method="post"
                                       action="{{ path('app_evenements_delete', {'id': evenement.id}) }}"

@@ -43,7 +43,10 @@
 
                             <div class="text-end d-flex flex-column gap-2">
                                 <a href="{{ path('app_evenements_show', {'id': evenement.id}) }}" class="btn btn-outline-primary btn-sm w-100">Voir détails</a>
-                                <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}" class="btn btn-outline-warning btn-sm w-100 text-dark">Modifier</a>
+                                {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_MEDECIN') %}
+                                    <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}" class="btn btn-outline-warning btn-sm w-100 text-dark">Modifier</a>
+                                {% endif %}
+
 
                                 {% if evenement.nbPlacesDispo > 0 %}
                                     {% if app.user %}
