@@ -1,0 +1,8 @@
+
+
+<form id="delete_offres_{{ offre.id }}_form"
+      action="{{ path('app_offres_delete', {'id': offre.id}) }}"
+      method="post"
+      style="display: none;">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ offre.id) }}">
+</form>
