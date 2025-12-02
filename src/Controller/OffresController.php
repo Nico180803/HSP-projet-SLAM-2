@@ -40,6 +40,8 @@ final class OffresController extends AbstractController
 
 
         $qb = $offresRepository->createQueryBuilder('o');
+        $qb->andWhere('o.date_fermeture > :today')
+            ->setParameter('today', new \DateTime());
 
 
         if (in_array('ROLE_ENTREPRISE', $this->getUser()->getRoles(), true)) {
@@ -87,7 +89,9 @@ final class OffresController extends AbstractController
 
         }
         $offre = new Offres();
-        $form = $this->createForm(OffresType::class, $offre);
+        $form = $this->createForm(OffresType::class, $offre, [
+            'user' => $this->getUser(),
+        ]);
         $form->handleRequest($request);
         $offre->setRefCreateur($this->getUser());
         if ($form->isSubmitted() && $form->isValid()) {
@@ -185,7 +189,9 @@ final class OffresController extends AbstractController
             }
 
         }
-        $form = $this->createForm(OffresType::class, $offre);
+        $form = $this->createForm(OffresType::class, $offre, [
+            'user' => $this->getUser(),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -211,7 +217,9 @@ final class OffresController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-        $form = $this->createForm(OffresType::class, $offre);
+        $form = $this->createForm(OffresType::class, $offre, [
+            'user' => $this->getUser(),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
