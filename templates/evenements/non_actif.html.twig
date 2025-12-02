@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Événements{% endblock %}
+{% block title %}Événements non actifs{% endblock %}
 
 {% block body %}
     {{ parent() }}
@@ -8,11 +8,11 @@
     <section class="section py-5">
         <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-            <!-- Titre + actions -->
+            <!-- Titre + action -->
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <div class="section-title m-0">
-                    <h2 class="mb-1">Événements</h2>
-                    <p class="text-muted mb-0">Découvrez et gérez les activités de la communauté</p>
+                    <h2 class="mb-1">Événements non actifs</h2>
+                    <p class="text-muted mb-0">Découvrez les potentielles futures activités</p>
                 </div>
 
                 <a href="{{ path('app_evenements_new') }}" class="btn btn-primary">
@@ -21,17 +21,14 @@
             </div>
 
             {% if evenements is empty %}
+
                 <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
                     <div class="card-body p-5 text-center">
                         <i class="bi bi-calendar-x display-5 d-block mb-3"></i>
-                        <h5 class="fw-semibold mb-2">Aucun événement disponible</h5>
+                        <h5 class="fw-semibold mb-2">Aucun événement non actif</h5>
                         <p class="text-muted mb-0">
-                            Créez votre premier événement pour qu’il apparaisse ici.
+                            Aucun événement n'est disponible pour le moment.
                         </p>
-
-                        <a href="{{ path('app_evenements_new') }}" class="btn btn-primary mt-3">
-                            <i class="bi bi-plus-circle me-1"></i> Créer un événement
-                        </a>
                     </div>
                 </div>
 
@@ -43,6 +40,7 @@
                         <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
                             <div class="card-body p-4 d-flex justify-content-between align-items-start">
 
+                                <!-- Informations -->
                                 <div class="me-4">
                                     <h5 class="fw-bold text-primary mb-1">
                                         <i class="bi bi-calendar-event me-1"></i> {{ evenement.titre }}
@@ -61,8 +59,10 @@
                                         : evenement.description }}
                                     </p>
 
+                                    <!-- Badges -->
                                     <div class="d-flex align-items-center gap-3 mt-3">
                                         <span class="badge bg-info text-dark">
+                                            <i class="bi bi-people me-1"></i>
                                             {{ evenement.nbPlacesDispo > 0
                                             ? evenement.nbPlacesDispo ~ ' places dispo'
                                             : 'Complet' }}
@@ -74,7 +74,7 @@
                                             </span>
                                         {% else %}
                                             <span class="badge bg-secondary">
-                                                <i class="bi bi-hourglass-split me-1"></i> Non validé
+                                                <i class="bi bi-x-circle me-1"></i> Non validé
                                             </span>
                                         {% endif %}
                                     </div>
@@ -85,16 +85,15 @@
 
                                     <a href="{{ path('app_evenements_show', {'id': evenement.id}) }}"
                                        class="btn btn-sm btn-outline-secondary w-100">
-                                        <i class="bi bi-eye me-1"></i> Voir
+                                        <i class="bi bi-eye me-1"></i> Voir détails
                                     </a>
 
-                                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_MEDECIN') %}
-                                        <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}"
-                                           class="btn btn-sm btn-outline-primary w-100">
-                                            <i class="bi bi-pencil-square me-1"></i> Modifier
-                                        </a>
-                                    {% endif %}
+                                    <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}"
+                                       class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="bi bi-pencil-square me-1"></i> Modifier
+                                    </a>
 
+                                    <!-- Inscriptions -->
                                     {% if evenement.nbPlacesDispo > 0 %}
                                         {% if app.user %}
                                             {% set alreadyRegistered = false %}
@@ -114,17 +113,21 @@
                                                     <i class="bi bi-person-check me-1"></i> Déjà inscrit
                                                 </button>
                                             {% endif %}
+
                                         {% else %}
-                                            <a href="{{ path('app_login') }}" class="btn btn-primary btn-sm w-100">
+                                            <a href="{{ path('app_login') }}"
+                                               class="btn btn-primary btn-sm w-100">
                                                 <i class="bi bi-box-arrow-in-right me-1"></i> Connectez-vous
                                             </a>
                                         {% endif %}
+
                                     {% else %}
                                         <button class="btn btn-danger btn-sm w-100" disabled>
                                             <i class="bi bi-x-circle me-1"></i> Complet
                                         </button>
                                     {% endif %}
                                 </div>
+
                             </div>
                         </div>
                     {% endfor %}
@@ -134,4 +137,5 @@
             {% endif %}
         </div>
     </section>
+
 {% endblock %}

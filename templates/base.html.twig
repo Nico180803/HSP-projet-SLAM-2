@@ -137,7 +137,17 @@
                                 {% endfor %}
                             </ul>
                         </li>
-                        <li><a href="{{ path('app_evenements_index') }}">Evenements</a></li>
+                        <li class="dropdown">
+                            <a href="#"><span>Évènements</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                            <ul>
+                                <li><a href="{{ path('app_evenements_mes_evenements') }}">Mes évènements</a></li>
+                                <li><a href="{{ path('app_evenements_mes_inscriptions') }}">Mes inscriptions</a></li>
+                                <li><a href="{{ path('app_evenements_index') }}">Tous les évènements</a></li>
+                                {% if 'ROLE_ADMIN' in app.user.roles or 'ROLE_MEDECIN' in app.user.roles %}
+                                    <li><a href="{{ path('app_evenements_non_actif') }}">Évènements à valider</a></li>
+                                {% endif %}
+                            </ul>
+                        </li>
                         {% if 'ROLE_MEDECIN' in app.user.roles %}
                         {% else %}
                             <li><a href="{{ path('app_offres_view') }}">Offres</a></li>

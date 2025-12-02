@@ -37,6 +37,64 @@ final class EvenementsController extends AbstractController
         ]);
     }
 
+    #[Route('/evenements/non-actif', name: 'app_evenements_non_actif', methods: ['GET'])]
+    public function evenementAValider(EvenementsRepository $evenementsRepository): Response
+    {
+        $evenements = $evenementsRepository->createQueryBuilder('e')
+            ->andWhere('e.est_valide = false')
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('evenements/non_actif.html.twig', [
+            'evenements' => $evenements,
+        ]);
+    }
+
+    #[Route('/evenements/mes-evenements', name: 'app_evenements_mes_evenements', methods: ['GET'])]
+    public function mesEvenements(EvenementsRepository $evenementsRepository): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Récupère les évènements dont l'utilisateur est responsable
+        $qb = $evenementsRepository->createQueryBuilder('e')
+            ->leftJoin('e.userEvenements', 'ue')
+            ->andWhere('ue.refUser = :user')
+            ->andWhere('ue.isResponsable = true')
+            ->setParameter('user', $user);
+
+        $evenements = $qb->getQuery()->getResult();
+
+        return $this->render('evenements/mes_evenements.html.twig', [
+            'evenements' => $evenements,
+        ]);
+    }
+
+    #[Route('/evenements/mes-inscriptions', name: 'app_evenements_mes_inscriptions', methods: ['GET'])]
+    public function mesInscriptions(EvenementsRepository $evenementsRepository): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Récupère les évènements aux quels l'utilisateur s'est inscrit
+        $qb = $evenementsRepository->createQueryBuilder('e')
+            ->leftJoin('e.userEvenements', 'ue')
+            ->andWhere('ue.refUser = :user')
+            ->andWhere('ue.isResponsable = false')
+            ->setParameter('user', $user);
+
+        $evenements = $qb->getQuery()->getResult();
+
+        return $this->render('evenements/mes_inscriptions.html.twig', [
+            'evenements' => $evenements,
+        ]);
+    }
+
+
     #[Route('/new', name: 'app_evenements_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response
     {

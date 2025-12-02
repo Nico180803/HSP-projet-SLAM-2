@@ -42,7 +42,7 @@
                             {# Champs selon le rôle de l'utilisateur qu'on modifie #}
                             {% set roles = form.vars.data.roles|default([]) %}
 
-                            {% if 'ROLE_USER' in roles or is_granted('ROLE_ADMIN') %}
+                            {% if 'ROLE_ETUDIANT' in roles or is_granted('ROLE_ADMIN') %}
                                 <hr>
                                 <h5 class="mb-3">Informations Étudiant</h5>
                                 <div class="row mb-3">
@@ -55,9 +55,9 @@
                                 </div>
                             {% endif %}
 
-                            {% if 'ROLE_PROF' in roles or is_granted('ROLE_ADMIN') %}
+                            {% if 'ROLE_MEDECIN' in roles or is_granted('ROLE_ADMIN') %}
                                 <hr>
-                                <h5 class="mb-3">Informations Professeur</h5>
+                                <h5 class="mb-3">Informations Medecin</h5>
                                 <div class="row mb-3">
                                     <div class="col-md-6">
                                         {{ form_row(form.specialite, {'attr': {'class': 'mb-3'}}) }}
@@ -95,7 +95,7 @@
                                         <i class="bi bi-arrow-left"></i> Retour à la liste
                                     </a>
                                 {% endif %}
-                                {{ form_end(form) }}
+                                {{ form_end(form, { render_rest: false}) }}
                                 <button class="btn btn-primary">
                                     <i class="bi bi-save me-1"></i> Mettre à jour
                                 </button>
