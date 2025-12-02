@@ -15,6 +15,13 @@
                         <a href="{{ path('app_offres_new') }}" class="btn btn-primary" data-aos="fade-up" data-aos-delay="150">
                             <i class="bi bi-person-plus-fill me-2"></i>Créer une nouvelle offre
                         </a>
+                        {% else %}
+                            <a href="{{ path('app_offres_view') }}" class="btn btn-outline-secondary me-2 {{ status is not defined or status != 'mine' ? 'active' : '' }}">
+                                Toutes les offres
+                            </a>
+                            <a href="{{ path('app_offres_view', {'status': 'mine'}) }}" class="btn btn-outline-secondary me-2 {{ status == 'mine' ? 'active' : '' }}">
+                                Mes candidatures
+                            </a>
                     {% endif %}
                 {% endif %}
             </div>
@@ -38,7 +45,9 @@
                     <div class="col-md-3 col-lg-4 mb-2" data-aos="fade-up" data-aos-delay="{{ 200 + loop.index * 50 }}">
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
+
                                 <h5 class="card-title">
+                                    <div>
                                     <i class="bi bi-person-circle me-2"></i>{{ offre.titre }}
                                     <span class="badge bg-primary-subtle text-dark">
                                         {% if offre.refUser %}
@@ -47,7 +56,10 @@
                                             Nombre de candidature: 0
                                         {% endif %}
                                     </span>
+                                    </div>
+
                                 </h5>
+
 
                                 <p class="card-text mb-2">
                                     <strong>Salaire:</strong>
@@ -77,19 +89,33 @@
                                     <a href="{{ path('app_offres_showOffre', {'id': offre.id}) }}" class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i> Voir
                                     </a>
-
+                                    {% if 'ROLE_ENTREPRISE' in app.user.roles %}
+                                    {% if offre.refCreateur == app.user or 'ROLE_ADMIN' in app.user.roles %}
+                                        <a href="{{ path('app_offres_candidatures', {'id': offre.id}) }}"
+                                           class="btn btn-sm btn-outline-info">
+                                            <i class="bi bi-people"></i> Voir les candidatures
+                                        </a>
+                                    {% endif %}
+                                    {% endif %}
                                     {% if 'ROLE_ENTREPRISE' in app.user.roles %}
 
                                         <a href="{{ path('app_offres_edit', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil"></i> Modifier
                                         </a>
+
+
                                     {% endif %}
                                     {% if 'ROLE_ETUDIANT' in app.user.roles %}
                                             {% if app.user in offre.refUser %}
+                                                <a href="{{ path('app_offres_annuler', {'id': offre.id}) }}"
+                                                   class="btn btn-sm btn-outline-danger">
+                                                    <i class="bi bi-x-circle"></i> Annuler ma candidature
+                                                </a>
 
-                                        <a href="{{ path('app_offres_postuler', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
-                                            <i class="bi bi-pencil"></i> Postuler
-                                        </a>
+                                                {% else %}
+                                                    <a href="{{ path('app_offres_postuler', {'id': offre.id}) }}" class="btn btn-sm btn-outline-secondary">
+                                                        <i class="bi bi-pencil"></i> Postuler
+                                                    </a>
                                             {% endif %}
                                     {% endif %}
                                 </div>

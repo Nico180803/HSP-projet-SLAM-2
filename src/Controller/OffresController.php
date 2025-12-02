@@ -35,7 +35,7 @@ final class OffresController extends AbstractController
             return $this->redirectToRoute('app_home');
         }
 
-
+        $status = $request->query->get('status', 'tous');
         $search = trim((string) $request->query->get('search', ''));
 
 
@@ -46,7 +46,10 @@ final class OffresController extends AbstractController
             $qb->andWhere('o.refCreateur = :user')
                 ->setParameter('user', $this->getUser());
         }
-
+        if ($status === "mine") {
+            $qb->andWhere(':user MEMBER OF o.refUser')
+                ->setParameter('user', $this->getUser());
+        }
 
         if ($search !== '') {
             $qb->andWhere('o.titre LIKE :search OR o.description LIKE :search')
@@ -66,6 +69,7 @@ final class OffresController extends AbstractController
         return $this->render('offres/view.html.twig', [
             'pagination' => $pagination,
             'search'     => $search,
+            'status'     => $status,
         ]);
     }
 
@@ -245,4 +249,25 @@ final class OffresController extends AbstractController
             return $this->redirectToRoute('app_offres_view', [], Response::HTTP_SEE_OTHER);
         }
     }
+    #[Route('/offres/{id}/annuler', name: 'app_offres_annuler', methods: ['GET', 'POST'])]
+    public function annuler(Offres $offre, Request $request, EntityManagerInterface $entityManagerInterface): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+
+        if ($offre->getRefUser()->contains($user)) {
+            $offre->removeRefUser($user);
+            $entityManagerInterface->persist($offre);
+            $entityManagerInterface->flush();
+
+            $this->addFlash('success', 'Votre candidature a été annulée.');
+        }
+
+        return $this->redirectToRoute('app_offres_view');
+    }
+
 }

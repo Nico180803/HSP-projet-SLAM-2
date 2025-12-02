@@ -40,7 +40,7 @@
                                 <tbody>
                                 {% for user in candidats %}
                                     <tr>
-                                        <td>{{ user.username ?? user.userIdentifier ?? '—' }}</td>
+                                        <td>{{ user.prenom ?? '_'}} {{ user.nom ?? '_'}}</td>
                                         <td>{{ user.email ?? '—' }}</td>
                                     </tr>
                                 {% endfor %}
