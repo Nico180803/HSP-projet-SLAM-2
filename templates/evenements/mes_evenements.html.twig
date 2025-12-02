@@ -1,86 +1,118 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes Évènements{% endblock %}
+{% block title %}Mes Événements{% endblock %}
 
 {% block body %}
     {{ parent() }}
 
-    <div class="container py-5">
+    <section class="section py-5">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-        <div class="bg-white shadow-sm rounded p-4 mb-4 d-flex justify-content-between align-items-center">
-            <div>
-                <h2 class="fw-bold text-primary mb-0">Mes événements</h2>
-                <p class="text-muted mb-0">Liste des événements dont vous êtes responsable</p>
+            <!-- Titre + actions -->
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1">Mes événements</h2>
+                    <p class="text-muted mb-0">Liste des événements dont vous êtes responsable</p>
+                </div>
+
+                <a href="{{ path('app_evenements_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle me-1"></i> Créer un événement
+                </a>
             </div>
 
-            <a href="{{ path('app_evenements_new') }}" class="btn btn-primary">
-                Créer un événement
-            </a>
-        </div>
+            {% if evenements is empty %}
 
-        {% if evenements is empty %}
-            <div class="alert alert-info text-center shadow-sm rounded">
-                Vous n’êtes responsable d’aucun événement pour le moment.
-            </div>
-        {% else %}
-            <div class="d-flex flex-column gap-4">
-                {% for evenement in evenements %}
-                    <div class="card shadow-sm border-0">
-                        <div class="card-body d-flex justify-content-between">
+                <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="150">
+                    <div class="card-body p-5 text-center">
+                        <i class="bi bi-calendar-x display-5 d-block mb-3"></i>
+                        <h5 class="fw-semibold mb-2">Aucun événement</h5>
+                        <p class="text-muted mb-0">
+                            Vous n’êtes actuellement responsable d’aucun événement.
+                        </p>
 
-                            <div>
-                                <h5 class="fw-bold text-primary mb-1">{{ evenement.titre }}</h5>
-
-                                <p class="text-muted mb-2">
-                                    {{ evenement.ville }},
-                                    {{ evenement.rue ?? 'Adresse non précisée' }},
-                                    {{ evenement.cp ?? '' }}
-                                </p>
-
-                                <p class="mb-2">
-                                    {{ evenement.description|length > 100
-                                    ? evenement.description|slice(0, 100) ~ '...'
-                                    : evenement.description
-                                    }}
-                                </p>
-
-                                <div class="d-flex align-items-center gap-3 mt-2">
-                                    <span class="badge bg-info text-dark">
-                                        {{ evenement.nbPlacesDispo }} places dispo
-                                    </span>
-
-                                    {% if evenement.estValide %}
-                                        <span class="badge bg-success">Validé</span>
-                                    {% else %}
-                                        <span class="badge bg-secondary">En attente</span>
-                                    {% endif %}
-                                </div>
-                            </div>
-
-                            <div class="text-end d-flex flex-column gap-2">
-                                <a href="{{ path('app_evenements_show', {'id': evenement.id}) }}"
-                                   class="btn btn-outline-primary btn-sm w-100">
-                                    Voir
-                                </a>
-
-                                <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}"
-                                   class="btn btn-outline-warning btn-sm w-100 text-dark">
-                                    Modifier
-                                </a>
-
-                                <form method="post"
-                                      action="{{ path('app_evenements_delete', {'id': evenement.id}) }}"
-                                      onsubmit="return confirm('Supprimer cet événement ?');">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.id) }}">
-                                    <button class="btn btn-outline-danger btn-sm w-100">Supprimer</button>
-                                </form>
-                            </div>
-
-                        </div>
+                        <a href="{{ path('app_evenements_new') }}" class="btn btn-primary mt-3">
+                            <i class="bi bi-plus-circle me-1"></i> Créer un événement
+                        </a>
                     </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+                </div>
 
-    </div>
+            {% else %}
+
+                <div class="d-flex flex-column gap-4">
+
+                    {% for evenement in evenements %}
+                        <div class="card shadow-sm border-0" data-aos="fade-up" data-aos-delay="{{ loop.index * 80 }}">
+                            <div class="card-body p-4 d-flex justify-content-between align-items-start">
+
+                                <!-- Infos événement -->
+                                <div class="me-4">
+                                    <h5 class="fw-bold text-primary mb-1">
+                                        <i class="bi bi-calendar-event me-1"></i> {{ evenement.titre }}
+                                    </h5>
+
+                                    <p class="text-muted mb-2">
+                                        <i class="bi bi-geo-alt me-1"></i>
+                                        {{ evenement.ville }},
+                                        {{ evenement.rue ?? 'Adresse non précisée' }},
+                                        {{ evenement.cp ?? '' }}
+                                    </p>
+
+                                    <p class="mb-2">
+                                        {{ evenement.description|length > 100
+                                        ? evenement.description|slice(0, 100) ~ '…'
+                                        : evenement.description
+                                        }}
+                                    </p>
+
+                                    <div class="d-flex align-items-center gap-3 mt-3">
+                                        <span class="badge bg-info text-dark">
+                                            <i class="bi bi-people me-1"></i>
+                                            {{ evenement.nbPlacesDispo }} places dispo
+                                        </span>
+
+                                        {% if evenement.estValide %}
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle me-1"></i> Validé
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">
+                                                <i class="bi bi-hourglass-split me-1"></i> En attente
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Actions -->
+                                <div class="text-end d-flex flex-column gap-2">
+                                    <a href="{{ path('app_evenements_show', {'id': evenement.id}) }}"
+                                       class="btn btn-sm btn-outline-secondary w-100">
+                                        <i class="bi bi-eye me-1"></i> Voir
+                                    </a>
+
+                                    <a href="{{ path('app_evenements_edit', {'id': evenement.id}) }}"
+                                       class="btn btn-sm btn-outline-primary w-100">
+                                        <i class="bi bi-pencil-square me-1"></i> Modifier
+                                    </a>
+
+                                    <form method="post"
+                                          action="{{ path('app_evenements_delete', {'id': evenement.id}) }}"
+                                          onsubmit="return confirm('Supprimer cet événement ?');">
+                                        <input type="hidden" name="_token"
+                                               value="{{ csrf_token('delete' ~ evenement.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger w-100">
+                                            <i class="bi bi-trash me-1"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+        </div>
+    </section>
+
 {% endblock %}
