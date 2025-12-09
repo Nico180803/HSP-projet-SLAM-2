@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Offres;
+use App\Entity\User;
 use App\Form\OffresType;
 use App\Repository\OffresRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -277,5 +278,23 @@ final class OffresController extends AbstractController
 
         return $this->redirectToRoute('app_offres_view');
     }
+    #[Route('/offres/{offre}/candidature/{user}/delete', name: 'app_offres_candidature_delete', methods: ['POST'])]
+    public function deleteCandidature(Offres $offre, User $user, Request $request, EntityManagerInterface $em): Response {
+
+
+        if (!$this->isCsrfTokenValid(
+            'delete_candidature_' . $offre->getId() . '_' . $user->getId(),
+            $request->request->get('_token')
+        )) {
+            return $this->redirectToRoute('app_offres_candidatures', ['id' => $offre->getId()]);
+        }
+
+
+        $offre->removeRefUser($user);
+        $em->flush();
+
+        return $this->redirectToRoute('app_offres_candidatures', ['id' => $offre->getId()]);
+    }
+
 
 }

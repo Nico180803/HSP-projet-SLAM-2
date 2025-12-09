@@ -35,13 +35,29 @@
                                 <tr>
                                     <th>Utilisateur</th>
                                     <th>Email</th>
+                                    <th class="text-end">Actions</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for user in candidats %}
+
                                     <tr>
-                                        <td>{{ user.prenom ?? '_'}} {{ user.nom ?? '_'}}</td>
+                                        <td>{{ user.prenom ?? '' }} {{ user.nom ?? '' }}</td>
                                         <td>{{ user.email ?? '—' }}</td>
+                                        <td class="text-end">
+                                           {% if 'ROLE_ENTREPRISE' in app.user.roles %}
+                                               <form method="post"
+                                                     action="{{ path('app_offres_candidature_delete', { offre: offre.id, user: user.id }) }}"
+                                                     onsubmit="return confirm('Supprimer cette candidature ?');"
+                                                     class="d-inline">
+                                                   <input type="hidden" name="_token"
+                                                          value="{{ csrf_token('delete_candidature_' ~ offre.id ~ '_' ~ user.id) }}">
+                                                   <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                       <i class="bi bi-trash"></i> Refuser
+                                                   </button>
+                                               </form>
+                                         {% endif %}
+                                        </td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
