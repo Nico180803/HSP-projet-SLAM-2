@@ -80,9 +80,11 @@ final class UserController extends AbstractController
         $form->remove('candidatures');
         $form->remove('refEtablissement');
         $form->remove('plainPassword');
+        if (!$this->isGranted('ROLE_ADMIN')) {
+            $form->remove('role');
+        }
         $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted()) {
             $entityManager->flush();
             return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
         }

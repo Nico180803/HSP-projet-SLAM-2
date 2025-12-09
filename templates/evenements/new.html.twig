@@ -3,43 +3,121 @@
 {% block title %}Création d'un évènement{% endblock %}
 
 {% block body %}
-    {{ parent() }}
+    <section class="section py-5" data-aos="fade-up">
+        <div class="container">
 
-    <div class="container mt-4" style="max-width: 600px;">
-        <h1 class="mb-3">Créer un évènement</h1>
-
-        {% for message in app.flashes('success') %}
-            <div class="alert alert-success">
-                {{ message }}
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <div class="section-title m-0">
+                    <h2 class="mb-1"><i class="bi bi-calendar-plus me-1"></i> Création d'un évènement</h2>
+                    <p class="text-muted mb-0">Remplissez le formulaire pour créer un nouvel évènement</p>
+                </div>
+                <a href="{{ path('app_evenements_index') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                </a>
             </div>
-        {% endfor %}
 
-        <div class="form-block p-3 border rounded" style="background-color: #f9f9f9;">
-            {{ include('evenements/_form.html.twig', {'button_label': button_label}) }}
-        </div>
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success shadow-sm rounded">
+                    {{ message }}
+                </div>
+            {% endfor %}
 
-        <div class="mt-2">
-            <a href="{{ path('app_evenements_index') }}" class="btn btn-secondary">
-                Revenir à la liste des événements
-            </a>
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+
+                    <h5 class="fw-bold text-primary mb-4">
+                        <i class="bi bi-pencil-square me-1"></i> {{ title }}
+                    </h5>
+
+                    <div class="form-block">
+                        {{ form_start(form) }}
+
+                        <div class="row g-3">
+                            {{ form_widget(form) }}
+                        </div>
+
+                        <button class="btn btn-primary mt-3">
+                            <i class="bi bi-save me-1"></i> {{ button_label }}
+                        </button>
+
+                        {{ form_end(form) }}
+                    </div>
+
+                </div>
+            </div>
+
         </div>
-    </div>
+    </section>
 
     <style>
-        .form-block { box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-        input[type="text"], input[type="date"], input[type="time"], textarea, select {
-            width: 100%; padding: 0.4rem 0.6rem; border: 1px solid #ccc; border-radius: 4px;
-            font-size: 0.95rem; box-sizing: border-box; transition: border-color 0.2s ease-in-out;
+        .form-block input[type="text"],
+        .form-block input[type="date"],
+        .form-block input[type="time"],
+        .form-block textarea,
+        .form-block select {
+            width: 100%;
+            padding: 0.65rem 0.75rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            font-size: 0.95rem;
+            transition: all 0.2s;
         }
-        input:focus, textarea:focus, select:focus { border-color: #007bff; outline: none; }
-        textarea { min-height: 80px; resize: vertical; }
-        label { display: block; margin-bottom: 0.2rem; font-weight: 500; font-size: 0.95rem; }
-        .form-group { margin-bottom: 0.8rem; }
-        h1 { font-size: 1.5rem; font-weight: 500; }
-        .btn { padding: 0.4rem 0.8rem; font-size: 0.95rem; }
+
+        .form-block input:focus,
+        .form-block textarea:focus,
+        .form-block select:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 5px rgba(13,110,253,0.3);
+            outline: none;
+        }
+
+        .form-block label {
+            font-weight: 500;
+            margin-bottom: .35rem;
+        }
+
+        .form-block textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
         .alert-success {
-            padding: 0.5rem 0.8rem; margin-bottom: 1rem; border: 1px solid #c3e6cb;
-            background-color: #d4edda; color: #155724; border-radius: 4px;
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-size: 0.95rem;
         }
     </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const select = document.querySelector('select[name$="[responsables][]"]');
+            if (!select) return;
+
+            // Barre de recherche
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'Tapez pour chercher un responsable...';
+            input.className = "form-control mb-2";
+            select.parentNode.insertBefore(input, select);
+
+            input.addEventListener('input', () => {
+                const filter = input.value.toLowerCase();
+                Array.from(select.options).forEach(option => {
+                    option.style.display = option.text.toLowerCase().includes(filter) ? 'block' : 'none';
+                });
+            });
+
+            // Bouton AUCUN RESPONSABLE
+            const noneBtn = document.createElement('button');
+            noneBtn.type = "button";
+            noneBtn.textContent = "Aucun responsable";
+            noneBtn.className = "btn btn-secondary mt-2 w-100";
+
+            select.parentNode.appendChild(noneBtn);
+
+            noneBtn.addEventListener('click', () => {
+                Array.from(select.options).forEach(opt => opt.selected = false);
+            });
+        });
+    </script>
 {% endblock %}

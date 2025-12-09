@@ -11,6 +11,8 @@ use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/offres')]
@@ -113,7 +115,7 @@ final class OffresController extends AbstractController
     }
 
     #[Route('/offres/{id}/postuler', name: 'app_offres_postuler', methods: ['POST','GET'])]
-    public function postuler(Offres $offre, Request $request, EntityManagerInterface $entityManagerInterface): Response
+    public function postuler(Offres $offre, Request $request, EntityManagerInterface $entityManagerInterface, MailerInterface $mailer): Response
     {
         $user = $this->getUser();
 
@@ -127,7 +129,21 @@ final class OffresController extends AbstractController
         $entityManagerInterface->persist($offre);
         $entityManagerInterface->flush();
 
-        $this->addFlash('success', 'Votre candidature a été enregistrée.');
+        try {
+            $email = (new Email())
+                ->from('support.hsp@hoziodev.fr')
+                ->to($user->getEmail())
+                ->subject('Candidature à une offre : '. $offre->getTitre())
+                ->html('<h1>Candidature à une offre</h1>
+                                  <h4>Bonjour, vous avez candidaté à une offre.</h4>
+                                  <h4>Voici l\'offre à la quelle vous avez postulé :</h4>
+                                  <h4>Titre : '. $offre->getTitre() .'</h4>
+                               <h4>Description : '. $offre->getDescription() .'</h4>');
+            $mailer->send($email);
+            $this->addFlash('success', 'Votre candidature a été enregistrée.');
+        } catch (\Exception $e) {
+            $this->addFlash('error', 'Erreur lors de l\'envoi du mail : ' . $e->getMessage());
+        }
 
         return $this->redirectToRoute('app_offres_view');
     }
