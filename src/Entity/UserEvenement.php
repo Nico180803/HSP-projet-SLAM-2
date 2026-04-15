@@ -25,6 +25,12 @@ class UserEvenement
     #[ORM\Column]
     private ?bool $isResponsable = null;
 
+    #[ORM\Column(options: ['default' => false])]
+    private ?bool $statut = false;
+
+    #[ORM\Column(type: 'datetime', nullable: true)]
+    private ?\DateTimeInterface $dateInscription = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -60,6 +66,28 @@ class UserEvenement
     public function setIsResponsable(bool $isResponsable): static
     {
         $this->isResponsable = $isResponsable;
+        return $this;
+    }
+
+    public function isStatut(): ?bool
+    {
+        return $this->statut;
+    }
+
+    public function setStatut(bool $statut): static
+    {
+        $this->statut = $statut;
+        return $this;
+    }
+
+    public function getDateInscription(): ?\DateTimeInterface
+    {
+        return $this->dateInscription;
+    }
+
+    public function setDateInscription(?\DateTimeInterface $dateInscription): static
+    {
+        $this->dateInscription = $dateInscription;
         return $this;
     }
 }

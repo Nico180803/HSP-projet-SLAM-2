@@ -301,7 +301,47 @@ final class EvenementsController extends AbstractController
         return $this->redirectToRoute('app_evenements_show', ['id' => $evenement->getId()]);
     }
 
-// Pour se désinscrire
+// Pour s'ajouter à la liste d'attente
+    #[Route('/{id}/waitlist', name: 'app_evenement_waitlist')]
+    public function waitlist(Evenements $evenement, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        if (!$user) {
+            $this->addFlash('error', 'Vous devez être connecté.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Vérifier que l'événement est bien complet
+        if ($evenement->getNbPlacesDispo() > 0) {
+            $this->addFlash('warning', 'Il reste des places disponibles, inscrivez-vous directement.');
+            return $this->redirectToRoute('app_evenements_show', ['id' => $evenement->getId()]);
+        }
+
+        // Déjà inscrit ou déjà en liste d'attente ?
+        $alreadyRegistered = $evenement->getUserEvenements()->exists(function($key, $ue) use ($user) {
+            return $ue->getRefUser() === $user;
+        });
+
+        if ($alreadyRegistered) {
+            $this->addFlash('warning', 'Vous êtes déjà inscrit ou en liste d\'attente.');
+            return $this->redirectToRoute('app_evenements_show', ['id' => $evenement->getId()]);
+        }
+
+        $userEvenement = new UserEvenement();
+        $userEvenement->setRefUser($user);
+        $userEvenement->setRefEvenement($evenement);
+        $userEvenement->setIsResponsable(false);
+        $userEvenement->setStatut(true);
+        $userEvenement->setDateInscription(new \DateTime());
+        $em->persist($userEvenement);
+
+        $em->flush();
+        $this->addFlash('success', 'Vous avez été ajouté à la liste d\'attente.');
+
+        return $this->redirectToRoute('app_evenements_show', ['id' => $evenement->getId()]);
+    }
+
+    // Pour se désinscrire
     #[Route('/{id}/leave', name: 'app_evenement_leave')]
     public function leave(Evenements $evenement, EntityManagerInterface $em): Response
     {
