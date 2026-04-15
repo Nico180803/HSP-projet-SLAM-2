@@ -26,7 +26,7 @@ final class AdminController extends AbstractController
             ->getQuery()
             ->getResult();
 
-        if ($this->getUser()->getRole() != 'ROLE_ADMIN') {
+        if ($this->getUser()->getRoles() != 'ROLE_ADMIN') {
             return $this->redirectToRoute('app_login');
         }
 
