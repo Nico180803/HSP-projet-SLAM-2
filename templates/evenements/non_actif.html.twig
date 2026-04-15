@@ -126,18 +126,27 @@
                                             <i class="bi bi-x-circle me-1"></i> Complet
                                         </button>
                                         {% if app.user %}
+                                            {% set alreadyRegistered = false %}
                                             {% set enAttente = false %}
                                             {% for ue in evenement.userEvenements %}
-                                                {% if ue.refUser == app.user and ue.statut %}
-                                                    {% set enAttente = true %}
+                                                {% if ue.refUser == app.user %}
+                                                    {% if ue.statut %}
+                                                        {% set enAttente = true %}
+                                                    {% else %}
+                                                        {% set alreadyRegistered = true %}
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endfor %}
 
                                             {% if enAttente %}
-                                                <button class="btn btn-warning btn-sm w-100" disabled>
+                                                <button class="btn btn-warning btn-sm w-100 mb-1" disabled>
                                                     <i class="bi bi-hourglass-split me-1"></i> En liste d'attente
                                                 </button>
-                                            {% else %}
+                                                <a href="{{ path('app_evenement_leave_waitlist', {'id': evenement.id}) }}"
+                                                   class="btn btn-danger btn-sm w-100">
+                                                    <i class="bi bi-x-circle me-1"></i> Se retirer
+                                                </a>
+                                            {% elseif not alreadyRegistered %}
                                                 <a href="{{ path('app_evenement_waitlist', {'id': evenement.id}) }}"
                                                    class="btn btn-warning btn-sm w-100">
                                                     <i class="bi bi-clock me-1"></i> Liste d'attente
