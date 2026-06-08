@@ -104,7 +104,7 @@ Les migrations Doctrine se trouvent dans le dossier `migrations/` et génèrent 
 
 ## 📝 Contexte scolaire
 
-Ce projet est réalisé dans le cadre de l'**épreuve E4** du **BTS SIO option SLAM** (Services Informatiques aux Organisations — Solutions Logicielles et Applications Métiers), session 2025–2026.
+Ce projet est réalisé dans le cadre de l'**épreuve E6** du **BTS SIO option SLAM** (Services Informatiques aux Organisations — Solutions Logicielles et Applications Métiers), session 2025–2026.
 
 Il s'inscrit dans le référentiel de compétences SLAM, notamment :
 - Conception et développement d'une solution applicative
